@@ -6,38 +6,42 @@ export async function POST(req: Request) {
   try {
     const { name, email, message }: BaseEmailProps = await req.json();
 
-    // Basic input validation
     if (!name || !email || !message) {
       return NextResponse.json(
         { success: false, error: "Missing required fields" },
         { status: 400 }
       );
     }
-    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid email format" },
-        { status: 400 }
-      );
-    }
 
+    // 1. BAGUHIN ANG TRANSPORTER PARA SA GMAIL
     const transporter = nodemailer.createTransport({
-      host: "smtp.hostinger.com",
-      port: 465,
-      secure: true,
+      service: "gmail",
       auth: {
-        user: process.env.SMTP_EMAIL!,
-        pass: process.env.SMTP_EMAIL_PASSWORD!,
+        user: process.env.SMTP_EMAIL, // Ito dapat ay luxurylevelco00@gmail.com sa Vercel
+        pass: process.env.SMTP_EMAIL_PASSWORD, // Ito yung 16-digit App Password
       },
     });
 
-    const mailOptions = {
-      from: '"Luxury Level Co" <rahimghanaei@luxurylevelco.com>',
-      to: process.env.SMTP_EMAIL!,
-      subject: `Product Inquiry from ${name}`,
+const mailOptions = {
+      // Si luxurylevelco00 ang "Machine" na nagpapadala
+      from: `"Luxury Level Inquiry" <${process.env.SMTP_EMAIL}>`, 
+      
+      // DITO MO ILAGAY ANG EMAIL NI BOSS (Para siya ang makatanggap)
+      to: "rahimghanaei@luxurylevelco.com", 
+      
+      // KAPAG NAG-REPLY SI BOSS, DITO PUPUNTA ANG SAGOT (Sa email ng customer)
+      replyTo: email, 
+      
+      subject: `New Inquiry: ${name}`,
       html: `
-        <p><strong>From:</strong> ${name}</p>
-        <p><strong>Email:</strong> ${email}</p>
-        <p><strong>Message:</strong> ${message}</p>
+        <div style="font-family: sans-serif; padding: 20px; border: 1px solid #eee;">
+          <h2 style="color: #333;">New Product Inquiry</h2>
+          <p><strong>Customer Name:</strong> ${name}</p>
+          <p><strong>Customer Email:</strong> ${email}</p>
+          <hr />
+          <p><strong>Message:</strong></p>
+          <p>${message}</p>
+        </div>
       `,
     };
 

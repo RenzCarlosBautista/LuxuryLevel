@@ -15,6 +15,19 @@ export interface Product {
   created_at: string;
   updated_at: string;
   brand_name?: string;
+  brand?: { id: number; name: string };
+  category?: { id: number; name: string; parent_id: number | null };
+  is_active?: boolean;
+  sale_price?: number | null;
+  sale_start_date?: string | null;
+  sale_end_date?: string | null;
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  password_hash: string;
+  created_at: string;
 }
 
 export interface Brand {
@@ -57,6 +70,7 @@ export interface ProductCardProps {
   id: number;
   name: string;
   price: number | null;
+  sale_price?: number | null;
   image_1: string | null;
   image_2: string | null;
   image_3: string | null;

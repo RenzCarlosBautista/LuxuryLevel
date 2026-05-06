@@ -1,4 +1,4 @@
-import Banner from "@/components/banner";
+ import Banner from "@/components/banner";
 import CardsSectionWrapper from "@/components/cards-section-wrappers/spec-wrapper";
 import CardsSectionLoading from "@/components/cards-section-wrappers/loading";
 import { Suspense } from "react";

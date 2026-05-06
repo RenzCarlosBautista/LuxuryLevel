@@ -53,7 +53,8 @@ export default function CardsSection({
                     imgSrc={imgSrc}
                     hoverImgSrc={hoverImgSrc}
                     productName={product.name}
-                    price={product.price ? String(product.price) : null}
+                    price={product.price}
+                    salePrice={product.sale_price}
                     className="hover:border-gray-200 hover:border transition-all duration-200 hover:scale-105"
                     href={`/products/${product.id}`}
                   />

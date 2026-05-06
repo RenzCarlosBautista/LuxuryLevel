@@ -27,7 +27,8 @@ export default async function FeaturedBrandProducts({
               hoverImgSrc={prod.image_3 || prod.image_2 || prod.image_1}
               href={`/products/${prod.id}`}
               productName={prod.name}
-              price={String(prod.price) || null}
+              price={prod.price}
+              salePrice={prod.sale_price}
               className="border-none"
             />
           ))}

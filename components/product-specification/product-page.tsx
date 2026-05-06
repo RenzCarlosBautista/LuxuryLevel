@@ -4,6 +4,7 @@ import { useState, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import RelatedProducts from "./related-products";
+import CompareButton from "./compare-button";
 import { ProductInformationResponse } from "@/lib/types";
 import { getWhatsAppUrl } from "@/lib/utils";
 
@@ -183,6 +184,7 @@ export default function ProductInfo({
               />
               <span>Send an email</span>
             </Link>
+            <CompareButton product={productInfo} />
           </div>
         </div>
 

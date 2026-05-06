@@ -3,6 +3,8 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/homepage/footer";
+import { headers } from "next/headers";
+import { ComparisonProvider } from "@/contexts/ComparisonContext";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -65,53 +67,71 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const headersList = await headers();
+  const pathname = headersList.get("x-pathname") || "";
+  const isAdminRoute = pathname.startsWith("/admin");
+  
   let brandsMenu = { brands: [] };
   let jewelryMenu = [];
   let bagsMenu = [];
 
-  try {
-    const [brandsRes, jewelryRes, bagsRes] = await Promise.all([
-      fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands`, { method: "GET" }),
-      fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/categories/jewelry/sub-categories`,
-        {
-          method: "GET",
-        }
-      ),
-      fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/categories/bags/available-brands`,
-        {
-          method: "GET",
-        }
-      ),
-    ]);
+  // Only fetch menu data if not an admin route
+  if (!isAdminRoute) {
+    try {
+      const [brandsRes, jewelryRes, bagsRes] = await Promise.all([
+        fetch(`${process.env.NEXT_PUBLIC_API_URL}/brands`, { method: "GET" }),
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories/jewelry/sub-categories`,
+          {
+            method: "GET",
+          }
+        ),
+        fetch(
+          `${process.env.NEXT_PUBLIC_API_URL}/categories/bags/available-brands`,
+          {
+            method: "GET",
+          }
+        ),
+      ]);
 
-    if (!brandsRes.ok || !jewelryRes.ok || !bagsRes.ok) {
-      throw new Error(
-        `API fetch failed: brands=${brandsRes.status}, jewelry=${jewelryRes.status}, bags=${bagsRes.status}`
-      );
+      if (!brandsRes.ok || !jewelryRes.ok || !bagsRes.ok) {
+        throw new Error(
+          `API fetch failed: brands=${brandsRes.status}, jewelry=${jewelryRes.status}, bags=${bagsRes.status}`
+        );
+      }
+
+      [brandsMenu, jewelryMenu, bagsMenu] = await Promise.all([
+        brandsRes.json(),
+        jewelryRes.json(),
+        bagsRes.json(),
+      ]);
+    } catch (error) {
+      console.error("Fetch error in RootLayout:", error);
     }
-
-    [brandsMenu, jewelryMenu, bagsMenu] = await Promise.all([
-      brandsRes.json(),
-      jewelryRes.json(),
-      bagsRes.json(),
-    ]);
-  } catch (error) {
-    console.error("Fetch error in RootLayout:", error);
   }
 
   return (
     <html lang="en">
       <body className={`${poppins.variable} antialiased`}>
-        <Navbar
-          brandsMenu={brandsMenu.brands}
-          jewelryMenu={jewelryMenu}
-          bagsMenu={bagsMenu}
-        />
-        {children}
-        <Footer />
+        {!isAdminRoute ? (
+          <ComparisonProvider>
+            <Navbar
+              brandsMenu={brandsMenu.brands}
+              jewelryMenu={jewelryMenu}
+              bagsMenu={bagsMenu}
+            />
+            {children}
+            <Footer />
+          </ComparisonProvider>
+        ) : (
+          children
+        )}
       </body>
     </html>
   );
+}
+
+// Helper function to check if route is admin
+function isAdminRoute(pathname: string): boolean {
+  return pathname.startsWith('/admin');
 }

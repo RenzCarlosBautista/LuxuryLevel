@@ -109,7 +109,8 @@ export default function RelatedProducts({
                         }
                         href={`/products/${prod.id}`}
                         productName={prod.name}
-                        price={prod.price ? String(prod.price) : null}
+                        price={prod.price}
+                        salePrice={prod.sale_price}
                         className="border-none"
                       />
                     </div>
