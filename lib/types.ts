@@ -98,6 +98,7 @@ export interface ProductInformationResponse {
 export interface BrandInfoFeaturedProps {
   id: string;
   logo_url: string;
+  name: string;
 }
 
 export interface FeaturedResponse {

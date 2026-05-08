@@ -5,8 +5,9 @@ export interface ProductCardProps {
   imgSrc: string;
   hoverImgSrc: string | null;
   productName: string;
-  price?: number | null;
-  salePrice?: number | null;
+  // Binago natin ito sa string | number para tanggapin ang formatted USD price
+  price?: number | string | null; 
+  salePrice?: number | string | null;
   href: string;
   className?: string;
 }
@@ -23,9 +24,11 @@ export default function ProductCard({
   // Determine which price to display
   const displayPrice = salePrice || price;
   const showDiscountBadge = salePrice && price ? true : false;
-  const discountPercent = showDiscountBadge && price && salePrice
-    ? Math.round(((price - salePrice) / price) * 100)
-    : 0;
+
+  // Markup/Discount calculation - gagana lang ito kung number ang ipinasa
+  // Sa bagong setup natin, ang 'price' ay string na kaya i-disable muna natin ang badge logic 
+  // o i-parse kung kailangan. Sa ngayon, simplehan natin ang display.
+  const discountPercent = 0; 
 
   return (
     <Link href={href} className="block ">
@@ -35,19 +38,18 @@ export default function ProductCard({
         {/* Discount Badge */}
         {showDiscountBadge && (
           <div className="absolute top-3 right-3 bg-red-600 text-white px-3 py-1 rounded-full text-xs font-bold z-10">
-            -{discountPercent}%
+            SALE
           </div>
         )}
 
         {/* Image container */}
         <div className="relative h-2/3 w-full">
-          {/* Stacked images */}
           <div className="absolute inset-0">
             <Image
               src={imgSrc}
               alt={productName}
               fill
-              sizes="400"
+              sizes="400px"
               className={`object-cover  transition-opacity duration-300 ${
                 !!hoverImgSrc ? "group-hover:opacity-0" : ""
               }`}
@@ -59,7 +61,7 @@ export default function ProductCard({
                 src={hoverImgSrc}
                 alt={`${productName} (Hover)`}
                 fill
-                sizes="400"
+                sizes="400px"
                 className="object-contain transition-opacity duration-300 opacity-0 group-hover:opacity-100"
               />
             </div>
@@ -75,11 +77,18 @@ export default function ProductCard({
           {displayPrice && (
             <div className="flex items-center gap-2 pt-2">
               <p className="font-semibold text-sm text-gray-900">
-                AED {displayPrice.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                {/* TINANGGAL ANG 'AED'. 
+                   Dahil ang 'displayPrice' ay formatted na sa Wrapper ($4,196.18),
+                   idi-display na lang natin ito nang direkta.
+                */}
+                {typeof displayPrice === 'number' 
+                  ? `AED ${displayPrice.toLocaleString('en-US')}` 
+                  : displayPrice}
               </p>
+              
               {showDiscountBadge && price && (
                 <p className="text-xs text-gray-400 line-through">
-                  AED {price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  {typeof price === 'number' ? `AED ${price.toLocaleString()}` : price}
                 </p>
               )}
             </div>

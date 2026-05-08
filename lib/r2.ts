@@ -48,6 +48,35 @@ export async function uploadImageToR2(
   }
 }
 
+/**
+ * Upload a file (as buffer) to R2
+ * Returns the full public URL
+ */
+export async function uploadFileToR2(
+  buffer: ArrayBuffer,
+  r2Key: string,
+  contentType: string = "application/octet-stream"
+): Promise<string> {
+  try {
+    await r2.send(
+      new PutObjectCommand({
+        Bucket: BUCKET_NAME,
+        Key: r2Key,
+        Body: Buffer.from(buffer),
+        ContentType: contentType,
+      })
+    );
+
+    // Return the full public URL
+    const r2Domain = process.env.NEXT_PUBLIC_R2_DOMAIN || "";
+    const publicUrl = `${r2Domain}/${r2Key}`;
+    return publicUrl;
+  } catch (error) {
+    console.error(`Failed to upload file to R2:`, error);
+    throw error;
+  }
+}
+
 export async function findImagePath(
   folderPath: string,
   imageNumber: string

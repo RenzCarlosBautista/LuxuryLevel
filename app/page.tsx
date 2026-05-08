@@ -2,7 +2,7 @@ import About from "@/components/homepage/about-us";
 import FeaturedBrands from "@/components/homepage/featured-brands";
 import { FeaturedWatchesWrapper } from "@/components/homepage/featured-watches";
 import Hero from "@/components/homepage/hero";
-import { FeaturedBrandProductsWrapper } from "@/components/homepage/rolex-brand";
+import { DynamicFeaturedBrandsWrapper } from "@/components/homepage/dynamic-featured-brands";
 import SalesInfo from "@/components/homepage/sales-info";
 import TrustedSeller from "@/components/homepage/trusted-seller";
 import VipDiscount from "@/components/homepage/vip-discount";
@@ -51,18 +51,7 @@ export default async function Page() {
       </Suspense>
       <About />
       <Suspense fallback={<CardsSectionLoading />}>
-        <FeaturedBrandProductsWrapper
-          category={"watches"}
-          limit={"6"}
-          brandName={"Rolex"}
-        />
-      </Suspense>
-      <Suspense fallback={<CardsSectionLoading />}>
-        <FeaturedBrandProductsWrapper
-          category={"watches"}
-          limit={"6"}
-          brandName={"Patek Philippe"}
-        />
+        <DynamicFeaturedBrandsWrapper category={"watches"} limit={"6"} />
       </Suspense>
       <TrustedSeller />
       <VipDiscount />

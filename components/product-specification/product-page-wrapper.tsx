@@ -1,5 +1,7 @@
 import ProductInfo from "@/components/product-specification/product-page";
 import { ProductInformationResponse } from "@/lib/types";
+import { createClient } from "@supabase/supabase-js";
+import { calculateFinalPriceUSD, formatUSD } from "@/lib/pricing";
 
 export default async function ProductPageWrapper({ id }: { id: string }) {
   const resData = await fetch(
@@ -12,9 +14,65 @@ export default async function ProductPageWrapper({ id }: { id: string }) {
 
   const data: ProductInformationResponse = await resData.json();
 
+  // --- PRICING ENGINE LOGIC ---
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+  );
+
+  const { data: settings } = await supabase
+    .from("store_settings")
+    .select("*")
+    .eq("id", 1)
+    .single();
+
+  const usdRate = settings?.usd_to_aed_rate || 3.67;
+  const markup = settings?.markup_percentage || 10;
+
+  // 1. I-convert ang presyo ng Main Product
+  const mainBasePrice = data.productInfo.price || 0;
+  const mainFinalUSD = calculateFinalPriceUSD(mainBasePrice, usdRate, markup);
+  
+  let mainSaleUSD = null;
+  if (data.productInfo.sale_price) {
+    mainSaleUSD = calculateFinalPriceUSD(data.productInfo.sale_price, usdRate, markup);
+  }
+
+  // Idadagdag natin as bagong properties para madaling tawagin sa UI
+  const updatedProductInfo = {
+    ...data.productInfo,
+    display_price: formatUSD(mainFinalUSD),
+    display_sale_price: mainSaleUSD ? formatUSD(mainSaleUSD) : null,
+  };
+
+  // 2. I-convert din ang presyo ng Related Products sa ibaba ng page!
+  const updatedRelatedProducts = (data.relatedProducts || []).map((prod: any) => {
+    const basePrice = prod.price || 0;
+    const finalUSD = calculateFinalPriceUSD(basePrice, usdRate, markup);
+    
+    let saleUSD = null;
+    if (prod.sale_price) {
+      saleUSD = calculateFinalPriceUSD(prod.sale_price, usdRate, markup);
+    }
+    
+    return {
+      ...prod,
+      display_price: formatUSD(finalUSD), // Sasaluhin ito ng ProductCard natin
+      price: formatUSD(finalUSD), // Fallback
+      sale_price: saleUSD ? formatUSD(saleUSD) : null,
+    };
+  });
+
+  const updatedData = {
+    ...data,
+    productInfo: updatedProductInfo as any, // Gumamit tayo ng as any para i-bypass ang mahigpit na TypeScript
+    relatedProducts: updatedRelatedProducts,
+  };
+  // ----------------------------
+
   return (
     <>
-      <ProductInfo {...data} />
+      <ProductInfo {...updatedData} />
     </>
   );
 }

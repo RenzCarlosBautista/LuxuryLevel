@@ -10,7 +10,6 @@ import { useRouter } from "next/navigation";
 import OurBrandsMenu from "@/components/dropdown-menus/brands-menu";
 import WatchesMenu from "@/components/dropdown-menus/watches-menu";
 import JewelryCategoriesMenu from "@/components/dropdown-menus/jewelry-menu";
-import BagsMenu from "@/components/dropdown-menus/bags-menu";
 import type { Brand, Category } from "@/lib/types";
 
 const robotoCondensed = Roboto_Condensed({
@@ -184,10 +183,10 @@ function Menu({
       ),
     },
     {
+      // Binago natin ito para maging direct link na lang
       title: "BAGS",
       link: "/bags",
-      hasDropdown: true,
-      element: <BagsMenu toggleMobileNav={toggleMobileNav} brands={bagsMenu} />,
+      hasDropdown: false, 
     },
     {
       title: "CONTACT US",
