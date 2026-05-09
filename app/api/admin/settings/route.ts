@@ -1,6 +1,6 @@
-// app/api/admin/settings/route.ts
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
+import { revalidatePath } from 'next/cache';
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -37,6 +37,20 @@ export async function PATCH(request: Request) {
       .select();
 
     if (error) throw error;
+
+    // --- AGGRESSIVE CACHE CLEARING ---
+    // Instead of relying on a broad layout clear, we explicitly tell Next.js 
+    // to purge the cache for every specific page that shows products.
+    revalidatePath('/');
+    revalidatePath('/watches');
+    revalidatePath('/jewelry');
+    revalidatePath('/bags');
+    revalidatePath('/brands');
+    
+    // This clears all dynamic product pages (e.g., /products/123)
+    revalidatePath('/products/[id]', 'page'); 
+    // ---------------------------------
+
     return NextResponse.json({ success: true, settings: data[0] });
   } catch (error: any) {
     return NextResponse.json({ success: false, error: error.message }, { status: 500 });

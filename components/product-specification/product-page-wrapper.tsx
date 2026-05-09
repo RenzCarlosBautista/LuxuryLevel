@@ -8,18 +8,25 @@ export default async function ProductPageWrapper({ id }: { id: string }) {
     `${process.env.NEXT_PUBLIC_API_URL}/products/${id}/information`,
     {
       method: "GET",
-      next: { revalidate: 60 },
+      next: { revalidate: 0 },
     }
   );
 
   const data: ProductInformationResponse = await resData.json();
 
   // --- PRICING ENGINE LOGIC ---
-  const supabase = createClient(
+const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+    process.env.SUPABASE_SERVICE_ROLE_KEY!, // <--- VIP Pass! (Ginamit natin ang Service Role)
+    {
+      auth: {
+        persistSession: false,
+      },
+      global: {
+        fetch: (url, options) => fetch(url, { ...options, cache: 'no-store' }),
+      },
+    }
   );
-
   const { data: settings } = await supabase
     .from("store_settings")
     .select("*")
@@ -28,6 +35,12 @@ export default async function ProductPageWrapper({ id }: { id: string }) {
 
   const usdRate = settings?.usd_to_aed_rate || 3.67;
   const markup = settings?.markup_percentage || 10;
+
+  console.log("=== PRICING DEBUG ===");
+  console.log("Fetched Settings:", settings);
+  console.log("Current Rate:", usdRate);
+  console.log("Current Markup:", markup);
+  console.log("Product Base AED Price:", data.productInfo.price);
 
   // 1. I-convert ang presyo ng Main Product
   const mainBasePrice = data.productInfo.price || 0;
