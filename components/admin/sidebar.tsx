@@ -3,7 +3,7 @@
 
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
-import { LayoutDashboard, Package, LogOut, Inbox } from 'lucide-react';
+import { LayoutDashboard, Package, LogOut, Inbox, Tag } from 'lucide-react';
 import { useState } from 'react';
 
 export default function AdminSidebar() {
@@ -41,6 +41,18 @@ export default function AdminSidebar() {
         >
           <LayoutDashboard size={20} />
           <span>Dashboard</span>
+        </Link>
+
+        <Link
+          href="/admin/brands"
+          className={`flex items-center space-x-3 px-4 py-3 rounded-lg transition ${
+            isActive('/admin/brands') || pathname.startsWith('/admin/brands/')
+              ? 'bg-blue-600 text-white'
+              : 'text-gray-300 hover:bg-gray-800'
+          }`}
+        >
+          <Tag size={20} />
+          <span>Brands</span>
         </Link>
 
         <Link

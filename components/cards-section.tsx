@@ -18,7 +18,6 @@ export default function CardsSection({
   brandsList: ProductResponse["subBrands"];
   colorsList: ProductResponse["colors"] | null;
   subCategoryList: Category[] | null;
-
   subBrandsList: Brand[] | null;
 }) {
   return (
@@ -53,7 +52,10 @@ export default function CardsSection({
                     imgSrc={imgSrc}
                     hoverImgSrc={hoverImgSrc}
                     productName={product.name}
-                    price={product.price}
+                    
+                    // ITO ANG NAGBAGO: Kukunin na natin ang na-compute na USD price!
+                    price={(product as any).display_price || product.price}
+                    
                     salePrice={product.sale_price}
                     className="hover:border-gray-200 hover:border transition-all duration-200 hover:scale-105"
                     href={`/products/${product.id}`}

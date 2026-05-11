@@ -7,7 +7,7 @@ export default async function Page() {
 
   try {
     const resBrands = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}//brands`,
+      `${process.env.NEXT_PUBLIC_API_URL}/brands`,
       {
         method: "GET",
         next: { revalidate: 60 },

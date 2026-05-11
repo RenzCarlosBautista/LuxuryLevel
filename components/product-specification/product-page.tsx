@@ -27,20 +27,22 @@ function ZoomableImage({ src }: { src: string }) {
       onMouseMove={handleMouseMove}
       onMouseEnter={() => setIsHovering(true)}
       onMouseLeave={() => setIsHovering(false)}
-      className="relative  w-full  overflow-hidden  flex items-center justify-center"
+      className="relative w-full aspect-square bg-zinc-50 rounded-2xl overflow-hidden flex items-center justify-center group border border-zinc-100 shadow-sm"
     >
       <Image
         src={src || "/placeholder-image.webp"}
-        alt="Zoomed Product Image"
-        width={450}
-        height={450}
-        className={`object-cover transition-transform duration-300 ${
-          isHovering ? "cursor-zoom-in scale-150" : "scale-100"
+        alt="Product Image"
+        fill
+        sizes="(max-width: 768px) 100vw, 50vw"
+        className={`object-contain p-8 transition-transform duration-700 ease-out ${
+          isHovering ? "cursor-zoom-in scale-[1.7]" : "scale-100"
         }`}
         style={{
           transformOrigin: `${position.x}% ${position.y}%`,
         }}
       />
+      {/* Subtle overlay hint */}
+      <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-500 pointer-events-none" />
     </div>
   );
 }
@@ -53,199 +55,195 @@ export default function ProductInfo({
 }: ProductInformationResponse) {
   const imageSources: string[] = [];
 
-  if (productInfo.image_1) {
-    imageSources.push(productInfo.image_1);
-  }
-  if (productInfo.image_2) {
-    imageSources.push(productInfo.image_2);
-  }
-  if (productInfo.image_3) {
-    imageSources.push(productInfo.image_3);
-  }
+  if (productInfo.image_1) imageSources.push(productInfo.image_1);
+  if (productInfo.image_2) imageSources.push(productInfo.image_2);
+  if (productInfo.image_3) imageSources.push(productInfo.image_3);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-
-  const goToPrev = () => {
-    setCurrentIndex((prev) =>
-      prev === 0 ? imageSources.length - 1 : prev - 1
-    );
-  };
-
-  const goToNext = () => {
-    setCurrentIndex((prev) =>
-      prev === imageSources.length - 1 ? 0 : prev + 1
-    );
-  };
 
   const message = `Hi! I'd like to inquire about ${productInfo.name}\n\nHere's the link:\n${process.env.NEXT_PUBLIC_FRONTEND_URL}/products/${productInfo.id}`;
 
   return (
-    <div className="bg-white w-full min-h-screen padding py-20 md:px-20 md:py-32 2xl:px-72 2xl:py-40 flex flex-col gap-10">
-      <div className="h-fit w-full flex flex-col lg:flex-row lg:justify-between gap-10 lg:gap-0">
-        {/* Product Images */}
-        <div className="w-full lg:w-1/3 flex flex-col gap-4 ">
-          {/* Main Display Image with Navigation */}
-          <div className="relative lg:w-fit ">
+    <div className="bg-white w-full min-h-screen pt-24 pb-20">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        
+        {/* Breadcrumb / Top Navigation (Optional but adds a premium feel) */}
+        <div className="flex items-center gap-2 text-xs font-medium text-zinc-400 uppercase tracking-widest mb-8">
+          <Link href="/" className="hover:text-zinc-900 transition-colors">Home</Link>
+          <span>/</span>
+          <Link href={`/brands/${brandInfo.id}`} className="hover:text-zinc-900 transition-colors">{brandInfo.name}</Link>
+          <span>/</span>
+          <span className="text-zinc-900 truncate max-w-[200px] sm:max-w-xs">{productInfo.name}</span>
+        </div>
+
+        {/* 2-Column Luxury Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16">
+          
+          {/* LEFT: Image Gallery (Takes up 7 columns) */}
+          <div className="lg:col-span-7 flex flex-col gap-6">
             <ZoomableImage src={imageSources[currentIndex] || ""} />
 
-            {/* Navigation Buttons */}
-            <button
-              onClick={goToPrev}
-              className="absolute top-1/2 left-0 transform -translate-y-1/2 text-gray-300 text-7xl hover:text-black z-10"
-            >
-              ‹
-            </button>
-            <button
-              onClick={goToNext}
-              className="absolute top-1/2 right-0 transform -translate-y-1/2 text-gray-300 text-7xl hover:text-black z-10"
-            >
-              ›
-            </button>
-          </div>
+            {/* Premium Thumbnails */}
+            <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-hide">
+              {imageSources.map((src, index) => {
+                if (!src) return null;
+                const isActive = currentIndex === index;
 
-          {/* Thumbnails */}
-          <div className="flex gap-2 ">
-            {imageSources.map((src, index) => {
-              if (!src) return null;
-
-              return (
-                <Image
-                  key={index}
-                  src={src}
-                  alt={`Thumbnail ${index + 1}  `}
-                  width={80}
-                  height={80}
-                  className={`cursor-pointer hover:-translate-y-1 transition-transform duration-300 object-contain  ${
-                    currentIndex === index ? "" : "bg-black opacity-50"
-                  }`}
-                  onClick={() => setCurrentIndex(index)}
-                />
-              );
-            })}
-          </div>
-        </div>
-
-        {/* Product Specs */}
-        <div className="w-full lg:w-1/3 flex flex-col gap-5 ">
-          <p className="text-3xl font-semibold">{productInfo.name}</p>
-
-          {/* <p className="text-gray-500">
-            Our price:{" "}
-            <span className="text-xl text-green-700 font-bold">
-              {product.price}
-            </span>
-          </p> */}
-
-          {/* <p className="font-semibold text-gray-500 italic">
-            ** Prices and availability subject to change at any time and does
-            not constitute a contract **
-          </p> */}
-
-          <div className="flex justify-between border-b">
-            <span>Ref No:</span>
-            <span>{productInfo.ref_no || "N/A"}</span>
-          </div>
-
-          <div className="flex justify-between border-b">
-            <span>Color:</span>
-            <span>{productInfo.color || "N/A"}</span>
-          </div>
-
-          <div className="flex justify-between border-b">
-            <span>Gender:</span>
-            <span>{productInfo.gender || "N/A"}</span>
-          </div>
-
-          <div className="flex w-full flex-col gap-2 mt-10">
-            <Link
-              href={getWhatsAppUrl({
-                message: encodeURIComponent(message),
+                return (
+                  <button
+                    key={index}
+                    onClick={() => setCurrentIndex(index)}
+                    className={`relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 transition-all duration-300 ease-out bg-zinc-50 border-2 ${
+                      isActive 
+                        ? "border-zinc-900 shadow-md scale-100" 
+                        : "border-transparent hover:border-zinc-300 opacity-60 hover:opacity-100 scale-95 hover:scale-100"
+                    }`}
+                  >
+                    <Image
+                      src={src}
+                      alt={`Thumbnail ${index + 1}`}
+                      fill
+                      className="object-contain p-2"
+                    />
+                  </button>
+                );
               })}
-              target="_blank"
-              className="bg-green-600 hover:bg-green-700  text-white button"
-            >
-              <Image
-                src={"/homepage-assets/whatsapp-logo.webp"}
-                alt={"inquire in whatsapp button"}
-                width={24}
-                height={24}
-              />
-              <span>Inquire on WhatsApp</span>
+            </div>
+          </div>
+
+          {/* RIGHT: Product Information (Takes up 5 columns) */}
+          <div className="lg:col-span-5 flex flex-col">
+            
+            {/* Brand Logo & Name */}
+            <Link href={`/brands/${brandInfo.id}`} className="group flex items-center gap-4 mb-6 w-fit">
+              {brandInfo.logo_url && (
+                <div className="relative w-16 h-16 rounded-full border border-zinc-100 shadow-sm bg-white overflow-hidden group-hover:shadow-md transition-shadow duration-300">
+                  <Image src={brandInfo.logo_url} alt={brandInfo.name} fill className="object-contain p-2" />
+                </div>
+              )}
+              <p className="text-sm font-bold tracking-widest uppercase text-zinc-500 group-hover:text-zinc-900 transition-colors duration-300">
+                {brandInfo.name}
+              </p>
             </Link>
-            <Link
-              href={`/contact-us?message=${encodeURIComponent(message)}`}
-              className=" hover:bg-gray-100  border text-black button"
-            >
-              <Image
-                src={"/svgs/email-black.svg"}
-                alt={"inquire in whatsapp button"}
-                width={24}
-                height={24}
-              />
-              <span>Send an email</span>
-            </Link>
-            <CompareButton product={productInfo} />
+
+            {/* Title */}
+            <h1 className="text-3xl sm:text-4xl font-light text-zinc-900 leading-tight mb-6">
+              {productInfo.name}
+            </h1>
+
+            {/* Price Display */}
+            <div className="mb-8">
+              {(productInfo as any).display_sale_price ? (
+                <div className="flex items-baseline gap-4">
+                  <p className="text-3xl font-medium text-red-600 tracking-tight">
+                    {(productInfo as any).display_sale_price}
+                  </p>
+                  <p className="text-xl text-zinc-400 line-through font-light">
+                    {(productInfo as any).display_price}
+                  </p>
+                </div>
+              ) : (
+                <p className="text-3xl font-medium text-zinc-900 tracking-tight">
+                  {(productInfo as any).display_price}
+                </p>
+              )}
+              <p className="text-xs text-zinc-400 mt-2 font-light">
+                * Prices and availability subject to change at any time.
+              </p>
+            </div>
+
+            <hr className="border-zinc-100 mb-8" />
+
+            {/* Specs Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-y-4 gap-x-8 mb-10">
+              <div className="flex flex-col gap-1 border-b border-zinc-100 pb-3">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Ref No</span>
+                <span className="text-zinc-900 font-medium">{productInfo.ref_no || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1 border-b border-zinc-100 pb-3">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Color</span>
+                <span className="text-zinc-900 font-medium">{productInfo.color || "N/A"}</span>
+              </div>
+              <div className="flex flex-col gap-1 border-b border-zinc-100 pb-3 sm:col-span-2">
+                <span className="text-xs font-semibold text-zinc-400 uppercase tracking-widest">Gender</span>
+                <span className="text-zinc-900 font-medium">{productInfo.gender || "N/A"}</span>
+              </div>
+            </div>
+
+            {/* Action Buttons (Premium Styling) */}
+            <div className="flex flex-col gap-3 mt-auto">
+              <Link
+                href={getWhatsAppUrl({ message: encodeURIComponent(message) })}
+                target="_blank"
+                className="group relative w-full flex items-center justify-center gap-3 bg-[#25D366] text-white py-4 rounded-xl font-semibold overflow-hidden transition-all duration-300 hover:shadow-lg hover:shadow-[#25D366]/30 hover:-translate-y-0.5"
+              >
+                <div className="absolute inset-0 bg-black/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-out" />
+                <Image src={"/homepage-assets/whatsapp-logo.webp"} alt="WhatsApp" width={20} height={20} className="relative z-10" />
+                <span className="relative z-10 tracking-wide">Inquire on WhatsApp</span>
+              </Link>
+              
+              <Link
+                href={`/contact-us?message=${encodeURIComponent(message)}`}
+                className="group relative w-full flex items-center justify-center gap-3 bg-white border-2 border-zinc-900 text-zinc-900 py-4 rounded-xl font-semibold transition-all duration-300 hover:bg-zinc-900 hover:text-white"
+              >
+                <span className="tracking-wide">Send an Email</span>
+              </Link>
+              
+              <div className="mt-2 flex justify-center">
+                <CompareButton product={productInfo} />
+              </div>
+            </div>
+
           </div>
         </div>
 
-        {/* Divider */}
-        <div className=" border-b lg:border-r border-gray-300" />
+        {/* Product Description - Editorial Style */}
+        {productInfo.description && (
+          <div className="mt-24 lg:mt-32 max-w-4xl mx-auto text-center">
+            <h2 className="text-sm font-bold tracking-[0.2em] uppercase text-zinc-400 mb-8">
+              Product Details
+            </h2>
+            <div className="bg-zinc-50/50 rounded-3xl p-8 sm:p-12 border border-zinc-100 shadow-sm transition-all duration-500 hover:shadow-md">
+              <div className="text-zinc-600 font-light text-base sm:text-lg leading-relaxed space-y-6 text-left">
+                {productInfo.description?.split("\n").map((details, index) => {
+                  if (details.includes(":") && details.split(":").length === 2 && details.split(" ").length < 20) {
+                    const specDetail = details.split(":");
+                    return (
+                      <div key={index} className="flex justify-between border-b border-zinc-200/50 pb-2">
+                        <span className="font-medium text-zinc-900">{specDetail[0]}</span>
+                        <span className="text-zinc-500">{specDetail[1]}</span>
+                      </div>
+                    );
+                  }
+                  if (details.split(" ").length < 10) {
+                    return (
+                      <p key={index} className="font-medium text-2xl text-zinc-900 mt-8 mb-4 text-center">
+                        {details}
+                      </p>
+                    );
+                  }
+                  return <p key={index}>{details}</p>;
+                })}
+              </div>
+            </div>
+          </div>
+        )}
 
-        {/* Brand Info */}
-        <div className="flex flex-col items-center ">
-          <p className="text-lg font-semibold">{brandInfo.name}</p>
-          <Link href={`/brands/${brandInfo.id}`}>
-            <Image
-              src={brandInfo.logo_url || ""}
-              alt={brandInfo.name}
-              width={180}
-              height={180}
-              className="cursor-pointer"
-            />
-          </Link>
-        </div>
+        {/* Related Products Divider */}
+        {relatedProducts.length > 0 && (
+          <div className="mt-24">
+            <div className="flex items-center gap-6 mb-12">
+              <div className="flex-1 h-px bg-zinc-200" />
+              <h2 className="text-xl font-light tracking-widest uppercase text-zinc-900">
+                You May Also Like
+              </h2>
+              <div className="flex-1 h-px bg-zinc-200" />
+            </div>
+            <RelatedProducts products={relatedProducts} />
+          </div>
+        )}
+        
       </div>
-
-      {/* Description  */}
-      <div className="h-fit flex flex-col items-start text-lg gap-6">
-        <div className="bg-gray-100 rounded-lg w-full h-fit  p-4 sm:p-10 ">
-          {productInfo.description?.split("\n").map((details, index) => {
-            if (
-              details.includes(":") &&
-              details.split(":").length === 2 &&
-              details.split(" ").length < 20
-            ) {
-              const specDetail = details.split(":");
-              return (
-                <p key={index} className="font-semibold mt-1 text-lg">
-                  {specDetail[0]}
-                  {":"}
-                  <span className="font-normal">{specDetail[1]}</span>
-                </p>
-              );
-            }
-
-            if (details.split(" ").length < 10) {
-              return (
-                <p key={index} className="font-semibold text-2xl mt-4 ">
-                  {details}
-                </p>
-              );
-            }
-
-            return (
-              <p key={index} className="">
-                {details}
-              </p>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
-        <RelatedProducts products={relatedProducts} />
-      )}
     </div>
   );
 }

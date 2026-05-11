@@ -1,14 +1,22 @@
-// app/admin/dashboard/page.tsx
 'use client';
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { LayoutDashboard, Package } from 'lucide-react';
+import { LayoutDashboard, Package, Tags, Settings } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+// Initialize Supabase to grab the quick counts
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
 
 interface DashboardStats {
   totalProducts: number;
   activeProducts: number;
   inactiveProducts: number;
+  totalBrands: number;
+  totalCategories: number;
 }
 
 export default function AdminDashboard() {
@@ -18,17 +26,33 @@ export default function AdminDashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const response = await fetch('/api/admin/products/list');
-        if (response.ok) {
-          const data = await response.json();
-          const products = data.products || [];
+        // Fetch all stats simultaneously for faster loading
+        const [productResponse, { count: brandCount }, { count: categoryCount }] = await Promise.all([
+          fetch('/api/admin/products/list'),
+          supabase.from('brand').select('*', { count: 'exact', head: true }),
+          supabase.from('category').select('*', { count: 'exact', head: true })
+        ]);
 
-          setStats({
-            totalProducts: data.pagination?.total || 0,
-            activeProducts: products.filter((p: any) => p.is_active).length,
-            inactiveProducts: products.filter((p: any) => !p.is_active).length,
-          });
+        let productData = { total: 0, active: 0, inactive: 0 };
+
+        if (productResponse.ok) {
+          const data = await productResponse.json();
+          const products = data.products || [];
+          productData = {
+            total: data.pagination?.total || products.length || 0,
+            active: products.filter((p: any) => p.is_active).length,
+            inactive: products.filter((p: any) => !p.is_active).length,
+          };
         }
+
+        setStats({
+          totalProducts: productData.total,
+          activeProducts: productData.active,
+          inactiveProducts: productData.inactive,
+          totalBrands: brandCount || 0,
+          totalCategories: categoryCount || 0,
+        });
+
       } catch (error) {
         console.error('Failed to fetch stats:', error);
       } finally {
@@ -42,14 +66,14 @@ export default function AdminDashboard() {
   return (
     <main className="flex-1 bg-gray-100 min-h-screen p-8">
       <div className="max-w-6xl mx-auto">
-        <h1 className="text-3xl font-bold text-gray-900 mb-8">Dashboard</h1>
+        <h1 className="text-3xl font-bold text-gray-900 mb-8">Command Center</h1>
 
         {loading ? (
-          <div className="text-center py-12">
-            <p className="text-gray-600">Loading...</p>
+          <div className="text-center py-12 animate-pulse">
+            <p className="text-gray-600 font-medium">Loading your metrics...</p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6 mb-12">
             <StatCard
               title="Total Products"
               value={stats?.totalProducts || 0}
@@ -61,6 +85,16 @@ export default function AdminDashboard() {
               color="green"
             />
             <StatCard
+              title="Total Brands"
+              value={stats?.totalBrands || 0}
+              color="purple"
+            />
+            <StatCard
+              title="Categories"
+              value={stats?.totalCategories || 0}
+              color="yellow"
+            />
+             <StatCard
               title="Inactive Products"
               value={stats?.inactiveProducts || 0}
               color="red"
@@ -68,16 +102,37 @@ export default function AdminDashboard() {
           </div>
         )}
 
-        <div className="bg-white rounded-lg shadow p-6">
-          <h2 className="text-xl font-bold text-gray-900 mb-4">Quick Actions</h2>
-          <div className="flex flex-col space-y-3">
+        <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-6">
+          <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
+            <LayoutDashboard size={24} className="text-indigo-600" />
+            Quick Actions
+          </h2>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
             <Link
               href="/admin/products"
-              className="inline-block bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg flex items-center space-x-2 transition max-w-xs"
+              className="bg-blue-50 hover:bg-blue-100 border border-blue-200 text-blue-700 font-semibold py-4 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition"
             >
-              <Package size={20} />
+              <Package size={28} />
               <span>Manage Products</span>
             </Link>
+
+            <Link
+              href="/admin/brands"
+              className="bg-purple-50 hover:bg-purple-100 border border-purple-200 text-purple-700 font-semibold py-4 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition"
+            >
+              <Tags size={28} />
+              <span>Manage Brands</span>
+            </Link>
+
+            <Link
+              href="/admin/settings"
+              className="bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 font-semibold py-4 px-4 rounded-xl flex flex-col items-center justify-center gap-3 transition"
+            >
+              <Settings size={28} />
+              <span>Pricing Settings</span>
+            </Link>
+
           </div>
         </div>
       </div>
@@ -85,31 +140,34 @@ export default function AdminDashboard() {
   );
 }
 
+// Upgraded StatCard with a new 'purple' color option
 interface StatCardProps {
   title: string;
   value: number;
-  color: 'blue' | 'green' | 'red' | 'yellow';
+  color: 'blue' | 'green' | 'red' | 'yellow' | 'purple';
 }
 
 function StatCard({ title, value, color }: StatCardProps) {
   const bgColors = {
-    blue: 'bg-blue-100',
-    green: 'bg-green-100',
-    red: 'bg-red-100',
-    yellow: 'bg-yellow-100',
+    blue: 'bg-blue-50 border-blue-100',
+    green: 'bg-green-50 border-green-100',
+    red: 'bg-red-50 border-red-100',
+    yellow: 'bg-amber-50 border-amber-100',
+    purple: 'bg-purple-50 border-purple-100',
   };
 
   const textColors = {
-    blue: 'text-blue-600',
-    green: 'text-green-600',
-    red: 'text-red-600',
-    yellow: 'text-yellow-600',
+    blue: 'text-blue-700',
+    green: 'text-green-700',
+    red: 'text-red-700',
+    yellow: 'text-amber-700',
+    purple: 'text-purple-700',
   };
 
   return (
-    <div className={`${bgColors[color]} rounded-lg shadow p-6`}>
-      <p className="text-sm font-medium text-gray-600">{title}</p>
-      <p className={`text-3xl font-bold ${textColors[color]} mt-2`}>{value}</p>
+    <div className={`${bgColors[color]} border rounded-xl p-6 transition-all hover:shadow-md`}>
+      <p className="text-sm font-semibold text-gray-500 uppercase tracking-wider">{title}</p>
+      <p className={`text-4xl font-extrabold ${textColors[color]} mt-3`}>{value}</p>
     </div>
   );
 }

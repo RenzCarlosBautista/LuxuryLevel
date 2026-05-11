@@ -1,8 +1,10 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { Brand } from "@/lib/types";
 import { Poppins } from "next/font/google";
 import { useRouter } from "next/navigation";
+import { createClient } from "@supabase/supabase-js";
 
 // Load Poppins font with a CSS variable
 const poppins = Poppins({
@@ -11,36 +13,62 @@ const poppins = Poppins({
   weight: ["400", "500", "600", "700"],
 });
 
-export default function BagsMenu({
+// Setup Supabase Client
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default function OurBrandsMenu({
   toggleMobileNav,
-  brands,
+  brands: initialBrands, // Tatanggapin pa rin natin in case may ipasa ang Navbar
 }: {
   toggleMobileNav?: () => void;
-  brands: Brand[];
+  brands?: Brand[];
 }) {
   const router = useRouter();
+  
+  // Gagamit tayo ng state para i-save ang mga brands mula sa database
+  const [brandsList, setBrandsList] = useState<Brand[]>(initialBrands || []);
+
+  // Kukunin natin ang mga brands mula sa Supabase kapag nag-load ang menu
+  useEffect(() => {
+    const fetchBrands = async () => {
+      const { data, error } = await supabase
+        .from("brand")
+        .select("*")
+        .order("name", { ascending: true }); // Naka-alphabetical order na ito!
+
+      if (data && !error) {
+        setBrandsList(data);
+      }
+    };
+
+    fetchBrands();
+  }, []);
 
   const redirect = (brand: Brand) => {
     if (toggleMobileNav) {
       toggleMobileNav();
     }
-
-    router.push(`/bags?brand=${brand.id}`);
+    // Set banner title through local storage
+    localStorage.setItem("banner-title", brand.name);
+    router.push(`/brands/${brand.id}`); // Siguraduhing tama ang ruta mo, minsan ay /products?brand=...
   };
 
   return (
     <div
-      className={`grid  grid-cols-1 lg:grid-cols-1 gap-4 ${poppins.className} p-4 bg-white`}
+      className={`grid grid-cols-1 lg:grid-cols-4 xl:grid-cols-6 gap-4 ${poppins.className} p-4 bg-white`}
     >
-      {brands.map((brand) => {
+      {brandsList.map((brand) => {
         if (!brand.name) return null;
 
         return (
           <button
             key={brand.id}
             onClick={() => redirect(brand)}
-            className={`font-normal pr-4  text-start 
-             lg:border-r-[1px] border-gray-300 lg:text-[12px] xl:text-[14px] hover:font-semibold`}
+            className={`font-normal pr-2 lg:text-[12px] xl:text-[14px] text-start 
+               lg:border-r-[1px] border-gray-300 hover:font-semibold uppercase`}
           >
             {brand.name}
           </button>
