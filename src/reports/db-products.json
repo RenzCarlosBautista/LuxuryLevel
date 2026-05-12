@@ -35298,15 +35298,6 @@
     "sale_price": null
   },
   {
-    "ref_no": "10092-PG",
-    "normalized_ref_no": "10092PG",
-    "name": "Messika Move Noa Bangle Pm 10092-PG Pink Gold Diamond Bracelet",
-    "category_name": "BRACELET",
-    "product_url": null,
-    "price": 18000,
-    "sale_price": null
-  },
-  {
     "ref_no": "10092-WG",
     "normalized_ref_no": "10092WG",
     "name": "Messika Move Noa Bangle 10092-WG White Gold Diamond Bracelet",
@@ -35379,21 +35370,12 @@
     "sale_price": null
   },
   {
-    "ref_no": "KELLY28BLUEENCRE",
-    "normalized_ref_no": "KELLY28BLUEENCRE",
-    "name": "Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag",
+    "ref_no": "BIRKIN30",
+    "normalized_ref_no": "BIRKIN30",
+    "name": "Hermes Birkin 30 Fauve Matt Croco Gold Hw Handbag",
     "category_name": "bags",
     "product_url": null,
-    "price": 315000,
-    "sale_price": null
-  },
-  {
-    "ref_no": "KELLY25BLACKSHINY",
-    "normalized_ref_no": "KELLY25BLACKSHINY",
-    "name": "Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag",
-    "category_name": "bags",
-    "product_url": null,
-    "price": 427000,
+    "price": 348000,
     "sale_price": null
   }
 ]
