@@ -35,6 +35,17 @@ export interface PriceMismatch {
   category_name: string | null;
 }
 
+export interface PriceComparison {
+  ref_no: string | null;
+  name: string;
+  db_price: number;
+  reference_price: number;
+  product_url: string | null;
+  category_name: string | null;
+  price_match: boolean;
+  match_source: "ref" | "name";
+}
+
 export async function compareDatabaseToReferenceSite(
   options: ReferenceSiteCompareOptions
 ): Promise<ReferenceSiteCompareResult> {
@@ -117,6 +128,24 @@ export async function compareDatabaseToReferenceSite(
     limit: options.limit,
   });
 
+  const missingListingByUrl = new Map<string, ListingProduct>();
+  for (const listing of missingListings) {
+    if (listing.product_url) {
+      missingListingByUrl.set(listing.product_url, listing);
+    }
+  }
+
+  for (const product of missingInDb) {
+    const listing = product.product_url
+      ? missingListingByUrl.get(product.product_url)
+      : undefined;
+    const isBagListing = Boolean(listing?.raw_category_name?.toLowerCase().includes("bag"));
+    if (isBagListing && listing?.normalized_ref_no) {
+      product.scraped_ref_no = listing.normalized_ref_no;
+      product.normalized_ref_no = listing.normalized_ref_no;
+    }
+  }
+
   if (options.writeStagingMissing) {
     await insertMissingInDbToStaging(missingInDb);
   }
@@ -135,6 +164,7 @@ export async function compareDatabaseToReferenceSite(
     return false;
   });
 
+  const priceComparisons = buildPriceComparisons(inBoth, referenceByRef, referenceByName);
   const priceMismatches = findPriceMismatches(inBoth, referenceByRef, referenceByName);
 
   await saveReport("reference-listings.json", referenceListings);
@@ -143,6 +173,7 @@ export async function compareDatabaseToReferenceSite(
   await saveReport("missing-in-db.json", missingInDb);
   await saveReport("in-both.json", inBoth);
   await saveReport("only-in-db.json", onlyInDb);
+  await saveReport("price-comparisons.json", priceComparisons);
   await saveReport("price-mismatches.json", priceMismatches);
   await saveReport("reference-compare-summary.json", {
     reference_count: referenceListings.length,
@@ -151,6 +182,7 @@ export async function compareDatabaseToReferenceSite(
     missing_in_db_scraped: missingInDb.length,
     in_both: inBoth.length,
     only_in_db: onlyInDb.length,
+    price_comparisons: priceComparisons.length,
     price_mismatches: priceMismatches.length,
     generated_at: new Date().toISOString(),
   });
@@ -337,4 +369,55 @@ function findPriceMismatches(
   }
 
   return mismatches;
+}
+
+function buildPriceComparisons(
+  dbProducts: DbProductSummary[],
+  referenceByRef: Map<string, ListingProduct>,
+  referenceByName: Map<string, ListingProduct>
+): PriceComparison[] {
+  const results: PriceComparison[] = [];
+
+  for (const product of dbProducts) {
+    const dbPrice = getEffectiveDbPrice(product);
+    if (dbPrice === null) {
+      continue;
+    }
+
+    let listing: ListingProduct | undefined;
+    let matchSource: "ref" | "name" | null = null;
+    if (product.normalized_ref_no) {
+      listing = referenceByRef.get(product.normalized_ref_no);
+      if (listing) {
+        matchSource = "ref";
+      }
+    }
+    if (!listing) {
+      const nameKey = normalizeNameKey(product.name);
+      if (nameKey) {
+        listing = referenceByName.get(nameKey);
+        if (listing) {
+          matchSource = "name";
+        }
+      }
+    }
+
+    if (!listing || listing.scraped_price === null || matchSource === null) {
+      continue;
+    }
+
+    const priceMatch = Math.abs(dbPrice - listing.scraped_price) <= 0.01;
+    results.push({
+      ref_no: product.ref_no,
+      name: product.name,
+      db_price: dbPrice,
+      reference_price: listing.scraped_price,
+      product_url: listing.product_url || null,
+      category_name: product.category_name,
+      price_match: priceMatch,
+      match_source: matchSource,
+    });
+  }
+
+  return results;
 }

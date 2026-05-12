@@ -1,10 +1,11 @@
 {
   "reference_count": 19,
-  "db_count": 3931,
-  "missing_in_db": 19,
-  "missing_in_db_scraped": 19,
-  "in_both": 0,
+  "db_count": 3933,
+  "missing_in_db": 17,
+  "missing_in_db_scraped": 17,
+  "in_both": 2,
   "only_in_db": 0,
+  "price_comparisons": 0,
   "price_mismatches": 0,
-  "generated_at": "2026-05-12T02:23:36.552Z"
+  "generated_at": "2026-05-12T06:16:02.501Z"
 }

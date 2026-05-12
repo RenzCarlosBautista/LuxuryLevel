@@ -1,8 +1,8 @@
 [
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-30-black-shiny-porosus/",
-    "scraped_ref_no": "CONSTANCE18BLUESAPHIRE",
-    "normalized_ref_no": "CONSTANCE18BLUESAPHIRE",
+    "scraped_ref_no": "BIRKIN30BLACKSHINY",
+    "normalized_ref_no": "BIRKIN30BLACKSHINY",
     "scraped_name": "Hermes Constance 18 Blue Saphire Epsom Leather Gold HW Handbag",
     "scraped_price": 65000,
     "currency": "AED",
@@ -31,7 +31,7 @@
       "Color": "Blue",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:22:51.050Z",
+    "scraped_at": "2026-05-12T06:14:14.537Z",
     "scrape_success": true,
     "error_message": null
   },
@@ -67,87 +67,14 @@
       "Color": "Blue",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:22:54.861Z",
-    "scrape_success": true,
-    "error_message": null
-  },
-  {
-    "product_url": "https://luxurysouq.com/hermes-kelly-28-blue-encre/",
-    "scraped_ref_no": "KELLY28BLUEENCRE",
-    "normalized_ref_no": "KELLY28BLUEENCRE",
-    "scraped_name": "Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag",
-    "scraped_price": 315000,
-    "currency": "AED",
-    "raw_brand_name": "Hermes",
-    "raw_category_name": "Bags",
-    "description": "The Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag is a rare and elegant piece crafted from shiny crocodile leather in a rich Blue Encre color. Highlighted with sleek palladium hardware, this handbag combines classic design with luxurious materials. The structured 28 cm size offers a perfect balance between function and style, making it suitable for both daily elegance and special occasions. With its timeless Kelly silhouette and high-end finish, this piece is a must-have for collectors and those who appreciate refined craftsmanship. Hermes Kelly 28 Blue Encre Shiny Specifications: The Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag is a rare and elegant piece crafted from shiny crocodile leather in a rich Blue Encre color. Highlighted with sleek palladium hardware, this handbag combines classic design with luxurious materials. The structured 28 cm size offers a perfect balance between function and style, making it suitable for both daily elegance and special occasions. With its timeless Kelly silhouette and high-end finish, this piece is a must-have for collectors and those who appreciate refined craftsmanship.",
-    "color": "Blue",
-    "gender": "Female",
-    "stock_status": null,
-    "image_url": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny.png-409x.webp",
-    "image_url_2": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny-1.png-409x.webp",
-    "image_url_3": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny-2.png-409x.webp",
-    "all_images": [
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny.png-409x.webp",
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny-1.png-409x.webp",
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-28-Blue-Encre-Shiny-2.png-409x.webp"
-    ],
-    "specifications": {
-      "Gender": "Female",
-      "Exterior Material": "Shiny Crocodile Leather",
-      "Hardware": "Palladium Tone",
-      "Size": "32",
-      "Color": "Blue",
-      "Style": "Top-handle handbag",
-      "Closure": "Flap with turn-lock",
-      "Interior": "Compact and structured",
-      "Design": "Timeless Kelly silhouette"
-    },
-    "scraped_at": "2026-05-12T02:22:56.740Z",
-    "scrape_success": true,
-    "error_message": null
-  },
-  {
-    "product_url": "https://luxurysouq.com/hermes-kelly-25-black-shiny/",
-    "scraped_ref_no": "KELLY25BLACKSHINY",
-    "normalized_ref_no": "KELLY25BLACKSHINY",
-    "scraped_name": "Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag",
-    "scraped_price": 327000,
-    "currency": "AED",
-    "raw_brand_name": "Hermes",
-    "raw_category_name": "Bags",
-    "description": "The Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag is a luxurious and elegant piece made from shiny black crocodile leather. It features stunning gold-tone hardware that adds a rich and classic touch. Designed in the iconic Kelly shape, this 25 cm handbag is compact yet perfectly sized for essentials. With its structured form, top handle, and timeless appeal, it’s an ideal choice for women who value sophistication and high fashion. The fine craftsmanship and rare materials make it a true collector’s item and a standout in any wardrobe. Hermes Kelly 25 Black Shiny Specifications: The Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag is a luxurious and elegant piece made from shiny black crocodile leather. It features stunning gold-tone hardware that adds a rich and classic touch. Designed in the iconic Kelly shape, this 25 cm handbag is compact yet perfectly sized for essentials. With its structured form, top handle, and timeless appeal, it’s an ideal choice for women who value sophistication and high fashion. The fine craftsmanship and rare materials make it a true collector’s item and a standout in any wardrobe.",
-    "color": "Black",
-    "gender": "Female",
-    "stock_status": null,
-    "image_url": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny.png-409x.webp",
-    "image_url_2": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny-1.png-409x.webp",
-    "image_url_3": "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny-2.png-409x.webp",
-    "all_images": [
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny.png-409x.webp",
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny-1.png-409x.webp",
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny-2.png-409x.webp",
-      "https://cdn-jnbkl.nitrocdn.com/DSyXimFVbLZsDRQHgxpswYJEIlNbdghE/assets/images/optimized/rev-c1b5645/luxurysouq.com/wp-content/webp-express/webp-images/doc-root/wp-content/uploads/2025/05/Hermes-Kelly-25-Black-Shiny-3.png-409x.webp"
-    ],
-    "specifications": {
-      "Gender": "Female",
-      "Exterior Material": "Shiny Crocodile Leather",
-      "Hardware": "Gold Tone",
-      "Size": "25",
-      "Color": "Black",
-      "Style": "Top-handle handbag",
-      "Closure": "Flap with gold turn-lock",
-      "Interior": "Compact and structured",
-      "Origin": "Hermès Paris"
-    },
-    "scraped_at": "2026-05-12T02:22:59.038Z",
+    "scraped_at": "2026-05-12T06:14:19.012Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-30-fauve-matt/",
-    "scraped_ref_no": "Birkin 30",
-    "normalized_ref_no": "BIRKIN30",
+    "scraped_ref_no": "BIRKIN30FAUVEMATT",
+    "normalized_ref_no": "BIRKIN30FAUVEMATT",
     "scraped_name": "Hermes Birkin 30 Fauve Matt Croco Gold Hw Handbag",
     "scraped_price": 348000,
     "currency": "AED",
@@ -175,14 +102,14 @@
       "Size": "30",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:01.325Z",
+    "scraped_at": "2026-05-12T06:14:21.638Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-roulis-18-mini-taupe-evervolor/",
-    "scraped_ref_no": "Roulis 18 Mini",
-    "normalized_ref_no": "ROULIS18MINI",
+    "scraped_ref_no": "ROULIS18MINITAUPE",
+    "normalized_ref_no": "ROULIS18MINITAUPE",
     "scraped_name": "Hermes Roulis 18 Mini Taupe Evervolor Leather Palladium HW Bag",
     "scraped_price": 36000,
     "currency": "AED",
@@ -211,7 +138,7 @@
       "Style": "Crossbody or shoulder bag",
       "Closure": "Front flap with signature metal clasp"
     },
-    "scraped_at": "2026-05-12T02:23:03.619Z",
+    "scraped_at": "2026-05-12T06:14:24.647Z",
     "scrape_success": true,
     "error_message": null
   },
@@ -242,14 +169,14 @@
       "Size": "42",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:05.911Z",
+    "scraped_at": "2026-05-12T06:14:30.589Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-35-etain-grey/",
-    "scraped_ref_no": "Birkin 35",
-    "normalized_ref_no": "BIRKIN35",
+    "scraped_ref_no": "BIRKIN35ETAINGREY",
+    "normalized_ref_no": "BIRKIN35ETAINGREY",
     "scraped_name": "Hermes Birkin 35 Etain Grey Togo Leather Palladium HW Handbag",
     "scraped_price": 77000,
     "currency": "AED",
@@ -280,14 +207,14 @@
       "Handle Style": "Double Top Handles",
       "Finish": "Textured Matte Leather"
     },
-    "scraped_at": "2026-05-12T02:23:08.156Z",
+    "scraped_at": "2026-05-12T06:14:36.089Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-kelly-32-black-clemence/",
-    "scraped_ref_no": "Kelly 32",
-    "normalized_ref_no": "KELLY32",
+    "scraped_ref_no": "KELLY32BLACKCLEMENCE",
+    "normalized_ref_no": "KELLY32BLACKCLEMENCE",
     "scraped_name": "Hermes Kelly 32 Black Clemence Leather Palladium Hardware Hand Bag",
     "scraped_price": 32000,
     "currency": "AED",
@@ -321,14 +248,14 @@
       "Size": "32",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:10.380Z",
+    "scraped_at": "2026-05-12T06:14:43.880Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-30-bordeaux/",
-    "scraped_ref_no": "Birkin 30",
-    "normalized_ref_no": "BIRKIN30",
+    "scraped_ref_no": "BIRKIN30BORDEAUX",
+    "normalized_ref_no": "BIRKIN30BORDEAUX",
     "scraped_name": "Hermes Birkin 30 Bordeaux Shiny Croco Gold Hardware Handbag",
     "scraped_price": 338000,
     "currency": "AED",
@@ -358,14 +285,14 @@
       "Style": "Top handle bag",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:12.334Z",
+    "scraped_at": "2026-05-12T06:14:50.072Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-25-graphite-matte-croco/",
-    "scraped_ref_no": "Birkin 25",
-    "normalized_ref_no": "BIRKIN25",
+    "scraped_ref_no": "BIRKIN25GRAPHITEMATTE",
+    "normalized_ref_no": "BIRKIN25GRAPHITEMATTE",
     "scraped_name": "Hermes Birkin 25 Graphite Matte Croco Gold Hardware Handbag",
     "scraped_price": 338000,
     "currency": "AED",
@@ -395,14 +322,14 @@
       "Category": "Luxury Handbag",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:14.333Z",
+    "scraped_at": "2026-05-12T06:14:56.670Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-35-feu-orange-epsom-leather/",
-    "scraped_ref_no": "Birkin 35",
-    "normalized_ref_no": "BIRKIN35",
+    "scraped_ref_no": "BIRKIN35FEUORANGE",
+    "normalized_ref_no": "BIRKIN35FEUORANGE",
     "scraped_name": "Hermes Birkin 35 FEU Orange Epsom Leather Gold HW Handbag",
     "scraped_price": 77000,
     "currency": "AED",
@@ -435,14 +362,14 @@
       "Hardware": "Gold-tone",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:16.589Z",
+    "scraped_at": "2026-05-12T06:15:04.071Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-bolide-35-etoupe-clemence-leather/",
-    "scraped_ref_no": "35 cm",
-    "normalized_ref_no": "35CM",
+    "scraped_ref_no": "BOLIDE35ETOUPECLEMENCE",
+    "normalized_ref_no": "BOLIDE35ETOUPECLEMENCE",
     "scraped_name": "Hermes Bolide 35 Etoupe Clemence Leather palladium HW Hardware",
     "scraped_price": 17000,
     "currency": "AED",
@@ -475,14 +402,14 @@
       "Style": "Everyday & Elegant",
       "Size": "35"
     },
-    "scraped_at": "2026-05-12T02:23:18.864Z",
+    "scraped_at": "2026-05-12T06:15:11.780Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-picotin-22-etoupe/",
-    "scraped_ref_no": "PICOTIN22ETOUPECLEMENCE",
-    "normalized_ref_no": "PICOTIN22ETOUPECLEMENCE",
+    "scraped_ref_no": "PICOTIN22ETOUPE",
+    "normalized_ref_no": "PICOTIN22ETOUPE",
     "scraped_name": "Hermes Picotin 22 Etoupe Clemence Palladium Hardware Hand Bag",
     "scraped_price": 15000,
     "currency": "AED",
@@ -515,14 +442,14 @@
       "Depth": "6.7 inches",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:21.095Z",
+    "scraped_at": "2026-05-12T06:15:23.969Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-kelly-25-retourne/",
-    "scraped_ref_no": "KELLY25RETOURNEETAIN",
-    "normalized_ref_no": "KELLY25RETOURNEETAIN",
+    "scraped_ref_no": "KELLY25RETOURNE",
+    "normalized_ref_no": "KELLY25RETOURNE",
     "scraped_name": "Hermes Kelly 25 Retourne Etain Togo Leather Palladium HW Hardware",
     "scraped_price": 110000,
     "currency": "AED",
@@ -553,14 +480,14 @@
       "Availability": "In Stock",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:23.363Z",
+    "scraped_at": "2026-05-12T06:15:30.592Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/hermes-birkin-30-himalaya/",
-    "scraped_ref_no": "BIRKIN30HIMALAYAWHITE",
-    "normalized_ref_no": "BIRKIN30HIMALAYAWHITE",
+    "scraped_ref_no": "BIRKIN30HIMALAYA",
+    "normalized_ref_no": "BIRKIN30HIMALAYA",
     "scraped_name": "Hermes Birkin 30 Himalaya White Croco Matt Palladium HW Hardware",
     "scraped_price": 830000,
     "currency": "AED",
@@ -589,7 +516,7 @@
       "Availability": "In Stock",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:25.601Z",
+    "scraped_at": "2026-05-12T06:15:34.700Z",
     "scrape_success": true,
     "error_message": null
   },
@@ -622,14 +549,14 @@
       "Availability": "In Stock",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:27.835Z",
+    "scraped_at": "2026-05-12T06:15:39.811Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/chanel-classic-red-caviar/",
-    "scraped_ref_no": null,
-    "normalized_ref_no": null,
+    "scraped_ref_no": "CLASSICREDCAVIAR",
+    "normalized_ref_no": "CLASSICREDCAVIAR",
     "scraped_name": "Chanel Classic Red Caviar Quilted Medium Double Flap Gold HW Handbag",
     "scraped_price": 29000,
     "currency": "AED",
@@ -653,14 +580,14 @@
       "Color": "Red",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:30.078Z",
+    "scraped_at": "2026-05-12T06:15:46.090Z",
     "scrape_success": true,
     "error_message": null
   },
   {
     "product_url": "https://luxurysouq.com/chanel-classic-black-caviar/",
-    "scraped_ref_no": null,
-    "normalized_ref_no": null,
+    "scraped_ref_no": "CLASSICBLACKCAVIAR",
+    "normalized_ref_no": "CLASSICBLACKCAVIAR",
     "scraped_name": "Chanel Classic Black Caviar Quilted Medium Double Flap Silver HW Handbag",
     "scraped_price": 29000,
     "currency": "AED",
@@ -685,7 +612,7 @@
       "Color": "Black",
       "Gender": "Female"
     },
-    "scraped_at": "2026-05-12T02:23:32.305Z",
+    "scraped_at": "2026-05-12T06:15:51.646Z",
     "scrape_success": true,
     "error_message": null
   }
