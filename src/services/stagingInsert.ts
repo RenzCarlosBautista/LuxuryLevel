@@ -76,16 +76,21 @@ function normalizeField(value: string | null): string | null {
 }
 
 function buildStagingRef(product: ScrapedProduct): string | null {
+  const isBag = (product.raw_category_name || "").toLowerCase().includes("bag");
   const rawRef = product.scraped_ref_no || product.normalized_ref_no || "";
   const refFromName = product.scraped_name ? extractRefFromText(product.scraped_name) : null;
   const refFromUrl = product.product_url ? extractRefFromSlug(new URL(product.product_url).pathname) : null;
   const fallbackFromName = product.scraped_name ? normalizeRef(product.scraped_name) : null;
 
-  const candidate =
-    normalizeRef(rawRef) ||
-    (refFromName ? normalizeRef(refFromName) : null) ||
-    (refFromUrl ? normalizeRef(refFromUrl) : null) ||
-    fallbackFromName;
+  const candidate = isBag
+    ? normalizeRef(refFromUrl || "") ||
+      normalizeRef(rawRef) ||
+      (refFromName ? normalizeRef(refFromName) : null) ||
+      fallbackFromName
+    : normalizeRef(rawRef) ||
+      (refFromName ? normalizeRef(refFromName) : null) ||
+      (refFromUrl ? normalizeRef(refFromUrl) : null) ||
+      fallbackFromName;
 
   return candidate && candidate.length > 0 ? candidate : null;
 }

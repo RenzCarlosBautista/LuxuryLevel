@@ -91,41 +91,63 @@ export async function collectListingProducts(
 
     const items = await page
       .$$eval(
-        "li.product a.woocommerce-LoopProduct-link, li.product a, .products a",
+        "li.product a.woocommerce-LoopProduct-link, li.product a, .products a, .product a",
         (anchors) =>
-          Array.from(anchors).map((anchor) => {
-            const link = anchor as HTMLAnchorElement;
-            const container = link.closest("li.product") || link.closest("li") || link.parentElement;
-            const nameEl =
-              container?.querySelector("h2.woocommerce-loop-product__title") ||
-              container?.querySelector("h3") ||
-              container?.querySelector(".product-title") ||
-              container?.querySelector(".woocommerce-loop-product__title") ||
-              container?.querySelector(".product-name") ||
-              link.querySelector("h2, h3");
-            const priceEl =
-              container?.querySelector(".price") ||
-              container?.querySelector(".woocommerce-Price-amount") ||
-              container?.querySelector(".amount");
-            const addToCart = container?.querySelector("a[href*='add-to-cart'], button[name='add-to-cart']") as
-              | HTMLAnchorElement
-              | HTMLButtonElement
-              | null;
-            const nameText =
-              nameEl?.textContent?.trim() ||
-              link.getAttribute("title") ||
-              link.getAttribute("aria-label") ||
-              link.textContent?.trim() ||
-              addToCart?.getAttribute("data-product_name") ||
-              addToCart?.getAttribute("aria-label") ||
-              addToCart?.getAttribute("title") ||
-              "";
-            return {
-              href: link.href || "",
-              name: nameText,
-              priceText: priceEl?.textContent?.trim() || "",
-            };
-          })
+          Array.from(anchors)
+            .filter((a) => {
+              try {
+                const href = (a as HTMLAnchorElement).href || "";
+                // skip add-to-cart links or javascript anchors
+                if (!href || href.includes("add-to-cart") || href.startsWith("javascript:")) {
+                  return false;
+                }
+                return true;
+              } catch {
+                return false;
+              }
+            })
+            .map((anchor) => {
+              const link = anchor as HTMLAnchorElement;
+              // try to find a nearby product container more flexibly
+              const container =
+                link.closest("li.product, .product, [class*='product-'], [class*='product']") ||
+                link.parentElement ||
+                link;
+
+              const nameEl =
+                container?.querySelector("h2.woocommerce-loop-product__title") ||
+                container?.querySelector("h3") ||
+                container?.querySelector(".product-title") ||
+                container?.querySelector(".woocommerce-loop-product__title") ||
+                container?.querySelector(".product-name") ||
+                link.querySelector("h2, h3");
+
+              // search several common places for the price, including nested bdi/span structure
+              const priceEl =
+                container?.querySelector(".price, .woocommerce-Price-amount, .amount, bdi, span.woocommerce-Price-amount, .product-details .price") ||
+                link.querySelector(".price, .woocommerce-Price-amount, .amount, bdi");
+
+              const addToCart = container?.querySelector("a[href*='add-to-cart'], button[name='add-to-cart']") as
+                | HTMLAnchorElement
+                | HTMLButtonElement
+                | null;
+
+              const nameText =
+                nameEl?.textContent?.trim() ||
+                link.getAttribute("title") ||
+                link.getAttribute("aria-label") ||
+                link.textContent?.trim() ||
+                addToCart?.getAttribute("data-product_name") ||
+                addToCart?.getAttribute("aria-label") ||
+                addToCart?.getAttribute("title") ||
+                "";
+
+              return {
+                href: link.href || "",
+                name: nameText,
+                priceText: priceEl?.textContent?.trim() || "",
+              };
+            })
       )
       .catch(() => [] as Array<{ href: string; name: string; priceText: string }>);
 

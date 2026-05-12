@@ -129,8 +129,12 @@ export async function scrapeProduct(
     const refFromUrl = extractRefFromSlug(new URL(productUrl).pathname);
     const refFromTitle = extractRefFromText(baseProduct.scraped_name);
     let scrapedRef = refFromSpecs || refFromUrl || refFromTitle;
-    if (!scrapedRef && isBagsCategory(baseProduct.raw_category_name)) {
-      scrapedRef = extractBagRefFromName(baseProduct.scraped_name, resolvedBrand);
+    if (isBagsCategory(baseProduct.raw_category_name)) {
+      if (refFromUrl) {
+        scrapedRef = refFromUrl;
+      } else if (!scrapedRef) {
+        scrapedRef = extractBagRefFromName(baseProduct.scraped_name, resolvedBrand);
+      }
     }
 
     baseProduct.scraped_ref_no = scrapedRef || null;
