@@ -1,14 +1,17 @@
 import { Page } from "playwright";
-import { extractRefFromSlug } from "../utils/normalize";
+import { extractRefFromSlug, normalizeRef } from "../utils/normalize";
 import { logger } from "../utils/logger";
 import { delay } from "../utils/delay";
 import { retry } from "../utils/retry";
+import { extractPrice } from "../utils/extractPrice";
 
 export interface ListingProduct {
   product_url: string;
   scraped_name: string;
   normalized_ref_no: string | null;
   raw_category_name: string | null;
+  scraped_price: number | null;
+  currency: string | null;
 }
 
 export interface CollectListingOptions {
@@ -100,6 +103,10 @@ export async function collectListingProducts(
               container?.querySelector(".woocommerce-loop-product__title") ||
               container?.querySelector(".product-name") ||
               link.querySelector("h2, h3");
+            const priceEl =
+              container?.querySelector(".price") ||
+              container?.querySelector(".woocommerce-Price-amount") ||
+              container?.querySelector(".amount");
             const addToCart = container?.querySelector("a[href*='add-to-cart'], button[name='add-to-cart']") as
               | HTMLAnchorElement
               | HTMLButtonElement
@@ -116,10 +123,11 @@ export async function collectListingProducts(
             return {
               href: link.href || "",
               name: nameText,
+              priceText: priceEl?.textContent?.trim() || "",
             };
           })
       )
-      .catch(() => [] as Array<{ href: string; name: string }>);
+      .catch(() => [] as Array<{ href: string; name: string; priceText: string }>);
 
     if (options.debug && items.length === 0) {
       const anchorSample = await page
@@ -136,12 +144,19 @@ export async function collectListingProducts(
         continue;
       }
 
-      const normalizedRef = extractRefFromSlug(new URL(item.href).pathname);
+      const displayName = item.name || slugToName(item.href) || "Unknown Product";
+      let normalizedRef = extractRefFromSlug(new URL(item.href).pathname);
+      if (!normalizedRef && options.category === "bags") {
+        normalizedRef = extractBagRefFromName(displayName);
+      }
+      const price = extractPrice(item.priceText);
       products.set(item.href, {
         product_url: item.href,
-        scraped_name: item.name || slugToName(item.href) || "Unknown Product",
+        scraped_name: displayName,
         normalized_ref_no: normalizedRef,
         raw_category_name: options.category || null,
+        scraped_price: price.value,
+        currency: price.currency,
       });
 
       if (options.limit && products.size >= options.limit) {
@@ -178,6 +193,25 @@ function slugToName(url: string): string | null {
   } catch {
     return null;
   }
+}
+
+function extractBagRefFromName(name: string): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  const tokens = trimmed.split(/\s+/).filter(Boolean);
+  if (tokens.length < 3) {
+    return null;
+  }
+
+  const refTokens = tokens.slice(1, 5);
+  if (refTokens.length === 0) {
+    return null;
+  }
+
+  return normalizeRef(refTokens.join(" ")) || null;
 }
 
 function isProductUrl(url: string): boolean {

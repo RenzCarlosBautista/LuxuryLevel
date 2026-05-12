@@ -22,7 +22,8 @@
     "scrape:report": "tsx src/index.ts --report",
     "scrape:brands": "tsx src/scrapers/discoverBrands.ts",
     "scrape:products": "tsx src/scrapers/collectProductLinks.ts",
-    "test:single": "tsx src/scripts/testSingleProduct.ts"
+    "test:single": "tsx src/scripts/testSingleProduct.ts",
+    "validate:listing-refs": "tsx src/scripts/validateListingRefs.ts"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.826.0",

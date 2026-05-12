@@ -128,7 +128,10 @@ export async function scrapeProduct(
 
     const refFromUrl = extractRefFromSlug(new URL(productUrl).pathname);
     const refFromTitle = extractRefFromText(baseProduct.scraped_name);
-    const scrapedRef = refFromSpecs || refFromUrl || refFromTitle;
+    let scrapedRef = refFromSpecs || refFromUrl || refFromTitle;
+    if (!scrapedRef && isBagsCategory(baseProduct.raw_category_name)) {
+      scrapedRef = extractBagRefFromName(baseProduct.scraped_name, resolvedBrand);
+    }
 
     baseProduct.scraped_ref_no = scrapedRef || null;
     baseProduct.normalized_ref_no = scrapedRef ? normalizeRef(scrapedRef) : null;
@@ -147,6 +150,45 @@ export async function scrapeProduct(
     logger.warn(`Failed scraping ${productUrl}: ${baseProduct.error_message}`);
     return baseProduct;
   }
+}
+
+function isBagsCategory(category: string | null): boolean {
+  if (!category) {
+    return false;
+  }
+  const value = category.toLowerCase();
+  return value.includes("bag");
+}
+
+function extractBagRefFromName(name: string, brand: string | null): string | null {
+  const trimmed = name.trim();
+  if (!trimmed) {
+    return null;
+  }
+
+  let tokens = trimmed.split(/\s+/).filter(Boolean);
+  if (tokens.length < 3) {
+    return null;
+  }
+
+  if (brand) {
+    const brandTokens = brand.split(/\s+/).filter(Boolean).map((token) => token.toLowerCase());
+    const lowered = tokens.map((token) => token.toLowerCase());
+    let offset = 0;
+    while (offset < brandTokens.length && lowered[offset] === brandTokens[offset]) {
+      offset += 1;
+    }
+    if (offset > 0) {
+      tokens = tokens.slice(offset);
+    }
+  }
+
+  const refTokens = tokens.slice(0, 4);
+  if (refTokens.length === 0) {
+    return null;
+  }
+
+  return normalizeRef(refTokens.join(" ")) || null;
 }
 
 async function extractSpecifications(page: Page): Promise<Record<string, string>> {

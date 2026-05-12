@@ -12,6 +12,8 @@ export interface DbProductSummary {
   name: string;
   category_name: string | null;
   product_url: string | null;
+  price: number | null;
+  sale_price: number | null;
 }
 
 export interface DbCompareResult {
@@ -81,7 +83,7 @@ export async function loadDbProductSummaries(): Promise<DbProductSummary[]> {
   const categories = await loadCategoryMap();
   const { data, error } = await supabase
     .from("product")
-    .select("ref_no,name,category_id")
+    .select("ref_no,name,category_id,price,sale_price")
     .order("id", { ascending: true });
 
   if (error) {
@@ -100,6 +102,8 @@ export async function loadDbProductSummaries(): Promise<DbProductSummary[]> {
       name: row.name,
       category_name: category,
       product_url: null,
+      price: typeof row.price === "number" ? row.price : null,
+      sale_price: typeof row.sale_price === "number" ? row.sale_price : null,
     };
   });
 }

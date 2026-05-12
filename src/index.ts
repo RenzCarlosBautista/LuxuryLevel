@@ -4,6 +4,7 @@ import { scrapeProductUrls } from "./scrapers/scrapeProductUrls";
 import { generateReports } from "./services/reportGenerator";
 import { compareDatabaseToReference } from "./services/dbCompare";
 import { compareDatabaseToReferenceSite } from "./services/referenceSiteCompare";
+import { insertScrapedProductsToStaging } from "./services/stagingInsert";
 import { logger } from "./utils/logger";
 
 interface CliOptions {
@@ -18,6 +19,8 @@ interface CliOptions {
   scrapeMissingDb: boolean;
   compareReferenceSite: boolean;
   categories?: string;
+  writeStagingMissing: boolean;
+  writeStaging: boolean;
 }
 
 function parseArgs(argv: string[]): CliOptions {
@@ -28,6 +31,8 @@ function parseArgs(argv: string[]): CliOptions {
     compareDb: false,
     scrapeMissingDb: false,
     compareReferenceSite: false,
+    writeStagingMissing: false,
+    writeStaging: false,
   };
 
   for (const arg of argv) {
@@ -53,6 +58,10 @@ function parseArgs(argv: string[]): CliOptions {
       options.compareReferenceSite = true;
     } else if (arg.startsWith("--categories=")) {
       options.categories = arg.split("=")[1];
+    } else if (arg === "--write-staging-missing") {
+      options.writeStagingMissing = true;
+    } else if (arg === "--write-staging") {
+      options.writeStaging = true;
     }
   }
 
@@ -73,6 +82,7 @@ async function main(): Promise<void> {
       concurrency: Number.isFinite(concurrency) ? concurrency : 1,
       limit: options.limit,
       categories,
+      writeStagingMissing: options.writeStagingMissing,
     });
     return;
   }
@@ -119,6 +129,10 @@ async function main(): Promise<void> {
 
   logger.info("Generating reports...");
   await generateReports(products, totalBrands, options.reference);
+
+  if (options.writeStaging) {
+    await insertScrapedProductsToStaging(products);
+  }
 
   if (options.report) {
     logger.report("Report generation complete.");
