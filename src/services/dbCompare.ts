@@ -5,6 +5,8 @@ import { getReportsDir, saveReport } from "./jsonStorage";
 import { fileExists, readJson } from "../utils/file";
 import { ScrapedProduct } from "../types/product";
 import { logger } from "../utils/logger";
+// 🚀 IMPORT AN BAGONG FUNCTION MULA SA STAGING INSERT
+import { insertMissingFromReferenceToStaging } from "./stagingInsert"; 
 
 export interface DbProductSummary {
   ref_no: string | null;
@@ -14,11 +16,13 @@ export interface DbProductSummary {
   product_url: string | null;
   price: number | null;
   sale_price: number | null;
+  brand_name?: string | null; // Added just in case
 }
 
 export interface DbCompareResult {
   dbProducts: DbProductSummary[];
   missingFromDb: ScrapedProduct[];
+  onlyInDb: DbProductSummary[]; // 🚀 IDINAGDAG: Mga products na nasa DB pero nawawala sa reference
 }
 
 export async function compareDatabaseToReference(
@@ -26,31 +30,52 @@ export async function compareDatabaseToReference(
 ): Promise<DbCompareResult> {
   const referenceProducts = await loadReferenceProducts(referenceFile);
   if (!referenceProducts) {
-    return { dbProducts: [], missingFromDb: [] };
+    return { dbProducts: [], missingFromDb: [], onlyInDb: [] };
   }
 
   const dbProducts = await loadDbProductSummaries();
+  
+  // Set ng mga references sa DB natin
   const dbRefSet = new Set(
     dbProducts
       .map((product) => product.normalized_ref_no)
       .filter((ref): ref is string => Boolean(ref))
   );
 
+  // Set ng mga references galing sa Scraped Site
+  const referenceSet = new Set(
+    referenceProducts
+      .map((product) => product.normalized_ref_no)
+      .filter((ref): ref is string => Boolean(ref))
+  );
+
+  // 1. Missing from DB (Mga bago na kailangang i-add)
   const missingFromDb = referenceProducts.filter((product) => {
-    if (!product.normalized_ref_no) {
-      return false;
-    }
+    if (!product.normalized_ref_no) return false;
     return !dbRefSet.has(product.normalized_ref_no);
+  });
+
+  // 2. 🚀 ONLY IN DB (Mga "Orphans" na nawawala na sa reference site)
+  const onlyInDb = dbProducts.filter((product) => {
+    if (!product.normalized_ref_no) return false;
+    return !referenceSet.has(product.normalized_ref_no);
   });
 
   await saveReport("db-products.json", dbProducts);
   await saveReport("missing-in-db.json", missingFromDb);
+  await saveReport("only-in-db.json", onlyInDb); // 🚀 I-save ang listahan ng orphans
 
   logger.report(
-    `DB comparison complete. DB: ${dbProducts.length}, Missing: ${missingFromDb.length}`
+    `DB comparison complete. DB: ${dbProducts.length}, Missing from DB: ${missingFromDb.length}, Orphans (To Archive): ${onlyInDb.length}`
   );
 
-  return { dbProducts, missingFromDb };
+  // 3. 🚀 IPASOK SA STAGING ANG MGA ORPHANS PARA MA-REVIEW SA DASHBOARD
+  if (onlyInDb.length > 0) {
+    logger.info(`Sending ${onlyInDb.length} orphan products to Staging for Archive Review...`);
+    await insertMissingFromReferenceToStaging(onlyInDb);
+  }
+
+  return { dbProducts, missingFromDb, onlyInDb };
 }
 
 async function loadReferenceProducts(referenceFile?: string): Promise<ScrapedProduct[] | null> {

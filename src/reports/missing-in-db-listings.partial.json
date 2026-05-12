@@ -16,22 +16,6 @@
     "currency": null
   },
   {
-    "product_url": "https://luxurysouq.com/hermes-kelly-28-blue-encre/",
-    "scraped_name": "Hermes Kelly 28 Blue Encre",
-    "normalized_ref_no": "KELLY28BLUEENCRE",
-    "raw_category_name": "bags",
-    "scraped_price": null,
-    "currency": null
-  },
-  {
-    "product_url": "https://luxurysouq.com/hermes-kelly-25-black-shiny/",
-    "scraped_name": "Hermes Kelly 25 Black Shiny",
-    "normalized_ref_no": "KELLY25BLACKSHINY",
-    "raw_category_name": "bags",
-    "scraped_price": null,
-    "currency": null
-  },
-  {
     "product_url": "https://luxurysouq.com/hermes-birkin-30-fauve-matt/",
     "scraped_name": "Hermes Birkin 30 Fauve Matt",
     "normalized_ref_no": "BIRKIN30FAUVEMATT",

@@ -5,7 +5,8 @@ import { DbProductSummary, loadDbProductSummaries } from "./dbCompare";
 import { collectListingProducts, ListingProduct } from "../scrapers/collectListingProducts";
 import { scrapeProductUrls } from "../scrapers/scrapeProductUrls";
 import { chromium } from "playwright";
-import { insertMissingInDbToStaging } from "./stagingInsert";
+import { insertMissingInDbToStaging, insertMissingFromReferenceToStaging } from "./stagingInsert";
+
 
 export interface ReferenceSiteCompareOptions {
   headless: boolean;
@@ -117,8 +118,15 @@ export async function compareDatabaseToReferenceSite(
     limit: options.limit,
   });
 
-  if (options.writeStagingMissing) {
+if (options.writeStagingMissing) {
+    // 1. I-insert ang mga BAGONG scraped items na wala sa database
     await insertMissingInDbToStaging(missingInDb);
+    
+    // 2. I-insert ang mga ORPHAN (Only in DB) items para pumasok sa "To Archive" tab
+    if (onlyInDb && onlyInDb.length > 0) {
+      logger.info(`Sending ${onlyInDb.length} orphan products to Staging for Archive Review...`);
+      await insertMissingFromReferenceToStaging(onlyInDb);
+    }
   }
 
   const inBoth = dbProducts.filter((product) => {

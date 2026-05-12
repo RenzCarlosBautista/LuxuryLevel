@@ -35377,5 +35377,32 @@
     "product_url": null,
     "price": 4999,
     "sale_price": null
+  },
+  {
+    "ref_no": "KELLY28BLUEENCRE",
+    "normalized_ref_no": "KELLY28BLUEENCRE",
+    "name": "Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 315000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "KELLY25BLACKSHINY",
+    "normalized_ref_no": "KELLY25BLACKSHINY",
+    "name": "Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 427000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "123345",
+    "normalized_ref_no": "123345",
+    "name": "Jansport",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 58,
+    "sale_price": null
   }
 ]

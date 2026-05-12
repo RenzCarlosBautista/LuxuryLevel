@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "ref_no": "123345",
+    "normalized_ref_no": "123345",
+    "name": "Jansport",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 58,
+    "sale_price": null
+  }
+]

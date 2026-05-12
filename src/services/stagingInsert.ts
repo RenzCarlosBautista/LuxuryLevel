@@ -129,3 +129,38 @@ function buildStagingRows(products: ScrapedProduct[]): StagingRow[] {
 
   return rows;
 }
+// BAGONG FUNCTION PARA SA MGA I-A-ARCHIVE NA PRODUCTS
+export async function insertMissingFromReferenceToStaging(localOrphans: any[]): Promise<void> {
+  if (localOrphans.length === 0) {
+    logger.info("No missing (orphan) products to insert into staging.");
+    return;
+  }
+
+  // I-map ang local database items papunta sa StagingRow format
+  const rows: StagingRow[] = localOrphans.map(product => ({
+    scraped_ref_no: product.ref_no,
+    scraped_name: product.name,
+    scraped_price: null, // 🚨 IMPORTANTE: Gawing null para pumasok sa "To Archive" tab
+    raw_brand_name: product.brand?.name || product.brand || "Unknown",
+    raw_category_name: product.category?.name || product.category || "Unknown",
+    sync_status: "missing", // 🚨 IMPORTANTE: Set status to 'missing'
+    scraped_at: new Date().toISOString(),
+    error_message: null,
+    image_url: null,
+    image_url_2: null,
+    image_url_3: null,
+    description: null,
+    color: null,
+    gender: null,
+  }));
+
+  const { error } = await supabase
+    .from("staging_products")
+    .upsert(rows, { onConflict: "scraped_ref_no" });
+
+  if (error) {
+    throw new Error(`Orphan staging insert failed: ${error.message}`);
+  }
+
+  logger.info(`Inserted ${rows.length} missing products (for archiving) into staging.`);
+}
