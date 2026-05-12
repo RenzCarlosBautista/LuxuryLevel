@@ -21,6 +21,48 @@ export async function GET(req: NextRequest) {
   let brandIds: number[] = [];
   let subBrands: { id: number; name: string }[] = [];
 
+  // Optional: category filter passed as query param (e.g. ?category=bags)
+  const categoryNameParam = searchParams.get('category');
+  let rootCategoryIdArray: number[] | null = null;
+  if (categoryNameParam) {
+    // Try to resolve category strictly: by slug -> exact name (case-insensitive) -> partial match
+    const requested = decodeURIComponent(categoryNameParam).toLowerCase();
+    let resolvedCategory: any = null;
+
+    try {
+      const bySlug = await supabase.from('category').select('id').eq('slug', requested).maybeSingle();
+      if (!bySlug.error && bySlug.data) resolvedCategory = bySlug.data;
+
+      if (!resolvedCategory) {
+        const byExactName = await supabase
+          .from('category')
+          .select('id')
+          .ilike('name', requested)
+          .maybeSingle();
+        if (!byExactName.error && byExactName.data) resolvedCategory = byExactName.data;
+      }
+
+      if (!resolvedCategory) {
+        const byPartial = await supabase
+          .from('category')
+          .select('id')
+          .ilike('name', `%${requested}%`)
+          .maybeSingle();
+        if (!byPartial.error && byPartial.data) resolvedCategory = byPartial.data;
+      }
+    } catch (e) {
+      console.warn('Category resolution error:', e);
+    }
+
+    if (resolvedCategory && resolvedCategory.id) {
+      rootCategoryIdArray = [resolvedCategory.id];
+    } else {
+      // If we couldn't resolve the category, return an empty result instead of all products.
+      console.warn(`Category not found for name/slug: ${categoryNameParam}`);
+      return NextResponse.json({ products: [], page: null, subBrands: [], colors: [] });
+    }
+  }
+
   if (filterBrand) {
     const bid = parseInt(filterBrand, 10);
     if (isNaN(bid)) {
@@ -65,7 +107,7 @@ export async function GET(req: NextRequest) {
   const { data: rpcData, error: rpcError } = await supabase.rpc(
     "get_filtered_products_with_category",
     {
-      p_root_category_id: null, // array of one
+      p_root_category_id: rootCategoryIdArray, // array of one or null
       p_filter_brand_ids: brandIds.length ? brandIds : null,
       p_filter_color: filterColor || null,
       p_filter_gender: filterGender || null,

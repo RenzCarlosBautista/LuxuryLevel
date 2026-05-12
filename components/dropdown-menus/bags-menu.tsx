@@ -19,25 +19,29 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
 );
 
-export default function OurBrandsMenu({
+export default function BagsMenu({
   toggleMobileNav,
-  brands: initialBrands, // Tatanggapin pa rin natin in case may ipasa ang Navbar
+  brands: initialBrands, // Accept pre-fetched brands to restrict to category
 }: {
   toggleMobileNav?: () => void;
   brands?: Brand[];
 }) {
   const router = useRouter();
-  
-  // Gagamit tayo ng state para i-save ang mga brands mula sa database
+
+  // Use provided brands if present; otherwise fetch all brands
   const [brandsList, setBrandsList] = useState<Brand[]>(initialBrands || []);
 
-  // Kukunin natin ang mga brands mula sa Supabase kapag nag-load ang menu
   useEffect(() => {
+    if (initialBrands && initialBrands.length > 0) {
+      setBrandsList(initialBrands);
+      return;
+    }
+
     const fetchBrands = async () => {
       const { data, error } = await supabase
         .from("brand")
         .select("*")
-        .order("name", { ascending: true }); // Naka-alphabetical order na ito!
+        .order("name", { ascending: true });
 
       if (data && !error) {
         setBrandsList(data);
@@ -45,7 +49,7 @@ export default function OurBrandsMenu({
     };
 
     fetchBrands();
-  }, []);
+  }, [initialBrands]);
 
   const redirect = (brand: Brand) => {
     if (toggleMobileNav) {

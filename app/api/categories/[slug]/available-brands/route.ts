@@ -44,11 +44,14 @@ export async function GET(
   try {
     const { slug: categoryName } = await params;
 
-    // Step 1: Get category by name
+    // Step 1: Get category by name (case-insensitive, partial match)
+    // Support slugs like 'bags' or 'hand-bags' by normalizing to spaces
+    const normalized = categoryName.replace(/[-_]/g, ' ');
     const { data: category, error: categoryError } = await supabase
       .from("category")
       .select("id")
-      .eq("name", categoryName)
+      .ilike("name", `%${normalized}%`)
+      .limit(1)
       .single();
 
     if (categoryError || !category) {

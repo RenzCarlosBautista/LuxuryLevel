@@ -5,8 +5,7 @@ import { DbProductSummary, loadDbProductSummaries } from "./dbCompare";
 import { collectListingProducts, ListingProduct } from "../scrapers/collectListingProducts";
 import { scrapeProductUrls } from "../scrapers/scrapeProductUrls";
 import { chromium } from "playwright";
-import { insertMissingInDbToStaging, insertMissingFromReferenceToStaging } from "./stagingInsert";
-
+import { insertMissingInDbToStaging, insertMissingFromReferenceToStaging, insertPriceUpdatesToStaging } from "./stagingInsert";
 
 export interface ReferenceSiteCompareOptions {
   headless: boolean;
@@ -59,69 +58,32 @@ export async function compareDatabaseToReferenceSite(
   const dbProducts = await loadDbProductSummaries();
   await saveReport("db-products.partial.json", dbProducts);
 
-  const dbRefs = new Set(
-    dbProducts
-      .map((product) => product.normalized_ref_no)
-      .filter((ref): ref is string => Boolean(ref))
-  );
-
-  const dbNameKeys = new Set(
-    dbProducts
-      .map((product) => normalizeNameKey(product.name))
-      .filter((key): key is string => Boolean(key))
-  );
-
-  const referenceRefs = new Set(
-    referenceListings
-      .map((product) => product.normalized_ref_no)
-      .filter((ref): ref is string => Boolean(ref))
-  );
-
-  const referenceNameKeys = new Set(
-    referenceListings
-      .map((product) => normalizeNameKey(product.scraped_name))
-      .filter((key): key is string => Boolean(key))
-  );
-
-  const referenceByRef = new Map<string, ListingProduct>();
-  const referenceByName = new Map<string, ListingProduct>();
-  for (const listing of referenceListings) {
-    if (listing.normalized_ref_no && !referenceByRef.has(listing.normalized_ref_no)) {
-      referenceByRef.set(listing.normalized_ref_no, listing);
-    }
-    const nameKey = normalizeNameKey(listing.scraped_name);
-    if (nameKey && !referenceByName.has(nameKey)) {
-      referenceByName.set(nameKey, listing);
-    }
-  }
-
-  const missingListings = referenceListings.filter((product) => {
-    const nameKey = normalizeNameKey(product.scraped_name);
-    if (nameKey && dbNameKeys.has(nameKey)) {
-      return false;
-    }
-    if (product.normalized_ref_no && dbRefs.has(product.normalized_ref_no)) {
-      return false;
-    }
-    return Boolean(nameKey || product.normalized_ref_no);
+  // 1. SMART MATCH: Missing from Reference (Bagong Scrape na wala pa sa DB)
+  const missingListings = referenceListings.filter((listing) => {
+    return !dbProducts.some(dbProduct => isSameProduct(dbProduct, listing));
   });
   await saveReport("missing-in-db-listings.partial.json", missingListings);
 
-  const onlyInDb = dbProducts.filter((product) => {
-    if (!matchesCategoryFilter(product.category_name, categories)) {
+  // 2. SMART MATCH: Orphans (Nasa DB pero wala na sa Reference Site)
+  const onlyInDb = dbProducts.filter((dbProduct) => {
+    if (!matchesCategoryFilter(dbProduct.category_name, categories)) {
       return false;
     }
-    const nameKey = normalizeNameKey(product.name);
-    if (nameKey && referenceNameKeys.has(nameKey)) {
-      return false;
-    }
-    if (product.normalized_ref_no && referenceRefs.has(product.normalized_ref_no)) {
-      return false;
-    }
-    return Boolean(nameKey || product.normalized_ref_no);
+    return !referenceListings.some(listing => isSameProduct(dbProduct, listing));
   });
 
-  const missingUrls = missingListings.map((product) => product.product_url);
+  // 3. SMART MATCH: In Both (Nasa DB at nasa Reference Site)
+  const inBoth = dbProducts.filter((dbProduct) => {
+    if (!matchesCategoryFilter(dbProduct.category_name, categories)) {
+      return false;
+    }
+    return referenceListings.some(listing => isSameProduct(dbProduct, listing));
+  });
+
+  const priceComparisons = buildPriceComparisons(inBoth, referenceListings);
+  const priceMismatches = findPriceMismatches(inBoth, referenceListings);
+
+  const missingUrls = missingListings.map((product) => product.product_url).filter((url): url is string => Boolean(url));
   const missingInDb = await scrapeProductUrls(missingUrls, {
     headless: options.headless,
     debug: options.debug,
@@ -129,33 +91,21 @@ export async function compareDatabaseToReferenceSite(
     limit: options.limit,
   });
 
-if (options.writeStagingMissing) {
-    // 1. I-insert ang mga BAGONG scraped items na wala sa database
-    await insertMissingInDbToStaging(missingInDb);
+  if (options.writeStagingMissing) {
+    if (missingInDb && missingInDb.length > 0) {
+      await insertMissingInDbToStaging(missingInDb);
+    }
     
-    // 2. I-insert ang mga ORPHAN (Only in DB) items para pumasok sa "To Archive" tab
     if (onlyInDb && onlyInDb.length > 0) {
       logger.info(`Sending ${onlyInDb.length} orphan products to Staging for Archive Review...`);
       await insertMissingFromReferenceToStaging(onlyInDb);
     }
+
+    if (priceMismatches && priceMismatches.length > 0) {
+      logger.info(`Sending ${priceMismatches.length} price updates to Staging...`);
+      await insertPriceUpdatesToStaging(priceMismatches);
+    }
   }
-
-  const inBoth = dbProducts.filter((product) => {
-    if (!matchesCategoryFilter(product.category_name, categories)) {
-      return false;
-    }
-    const nameKey = normalizeNameKey(product.name);
-    if (nameKey && referenceNameKeys.has(nameKey)) {
-      return true;
-    }
-    if (product.normalized_ref_no && referenceRefs.has(product.normalized_ref_no)) {
-      return true;
-    }
-    return false;
-  });
-
-  const priceComparisons = buildPriceComparisons(inBoth, referenceByRef, referenceByName);
-  const priceMismatches = findPriceMismatches(inBoth, referenceByRef, referenceByName);
 
   await saveReport("reference-listings.json", referenceListings);
   await saveReport("db-products.json", dbProducts);
@@ -192,6 +142,39 @@ if (options.writeStagingMissing) {
   };
 }
 
+// ==========================================
+// 🧠 ANG ATING SMART MATCHER 
+// ==========================================
+// 🧠 ANG MAS MATALINONG SMART MATCHER 
+function isSameProduct(dbProduct: DbProductSummary, listing: ListingProduct): boolean {
+  // 1. Exact Ref/SKU Match
+  if (dbProduct.normalized_ref_no && listing.normalized_ref_no) {
+    if (dbProduct.normalized_ref_no === listing.normalized_ref_no) return true;
+  }
+
+  // 2. Smart Name Match (Pang-counter sa "...", putol na words, o baligtad na salita)
+  const dbName = normalizeNameKey(dbProduct.name) || "";
+  const listName = normalizeNameKey(listing.scraped_name) || "";
+
+  if (dbName && listName) {
+    if (dbName === listName) return true;
+    
+    // Gagamit tayo ng .includes() imbes na .startsWith()
+    // Kung ang isang buong pangalan ay nasa loob ng isa pang pangalan, MATCH 'yan!
+    if (dbName.length > 12 && listName.length > 12) {
+      if (dbName.includes(listName) || listName.includes(dbName)) {
+        return true;
+      }
+    }
+  }
+
+  return false;
+}
+
+// ==========================================
+// MGA HELPER FUNCTIONS MO
+// ==========================================
+
 async function scrapeReferenceSite(
   categories: string[],
   options: ReferenceSiteCompareOptions
@@ -227,22 +210,11 @@ function dedupeProducts(products: ListingProduct[]): ListingProduct[] {
   const unique: ListingProduct[] = [];
 
   for (const product of products) {
-    if (product.normalized_ref_no && seenRefs.has(product.normalized_ref_no)) {
-      continue;
-    }
+    if (product.normalized_ref_no && seenRefs.has(product.normalized_ref_no)) continue;
+    if (product.product_url && seenUrls.has(product.product_url)) continue;
 
-    if (product.product_url && seenUrls.has(product.product_url)) {
-      continue;
-    }
-
-    if (product.normalized_ref_no) {
-      seenRefs.add(product.normalized_ref_no);
-    }
-
-    if (product.product_url) {
-      seenUrls.add(product.product_url);
-    }
-
+    if (product.normalized_ref_no) seenRefs.add(product.normalized_ref_no);
+    if (product.product_url) seenUrls.add(product.product_url);
     unique.push(product);
   }
 
@@ -251,100 +223,57 @@ function dedupeProducts(products: ListingProduct[]): ListingProduct[] {
 
 function getCategoryUrl(category: string): string {
   const normalized = category.toLowerCase();
-  if (normalized === "jewelry") {
-    return "https://luxurysouq.com/jewellery/";
-  }
+  if (normalized === "jewelry") return "https://luxurysouq.com/jewellery/";
   return `https://luxurysouq.com/${normalized}/`;
 }
 
 function matchesCategoryFilter(categoryName: string | null, categories: string[]): boolean {
-  if (!categoryName) {
-    return false;
-  }
-
+  if (!categoryName) return false;
   const normalizedCategory = normalizeCategoryName(categoryName);
   return categories.some((category) => {
     const normalizedFilter = normalizeCategoryName(category);
-    if (!normalizedFilter) {
-      return false;
-    }
-    if (normalizedCategory.includes(normalizedFilter)) {
-      return true;
-    }
-
+    if (!normalizedFilter) return false;
+    if (normalizedCategory.includes(normalizedFilter)) return true;
     const keywords = getCategoryKeywords(normalizedFilter);
     return keywords.some((keyword) => normalizedCategory.includes(keyword));
   });
 }
 
 function getCategoryKeywords(category: string): string[] {
-  if (category === "jewelry") {
-    return ["jewel", "ring", "bracelet", "necklace", "earring", "pendant", "cufflink", "brooch", "bangle"];
-  }
-  if (category === "bags") {
-    return ["bag", "handbag", "purse", "wallet", "clutch"];
-  }
-  if (category === "watches") {
-    return ["watch"];
-  }
+  if (category === "jewelry") return ["jewel", "ring", "bracelet", "necklace", "earring", "pendant", "cufflink", "brooch", "bangle"];
+  if (category === "bags") return ["bag", "handbag", "purse", "wallet", "clutch"];
+  if (category === "watches") return ["watch"];
   return [];
 }
 
 function normalizeCategoryName(value: string): string {
-  return value
-    .toLowerCase()
-    .replace(/[^a-z]/g, "")
-    .replace("jewellery", "jewelry")
-    .trim();
+  return value.toLowerCase().replace(/[^a-z]/g, "").replace("jewellery", "jewelry").trim();
 }
 
 function normalizeNameKey(name: string | null | undefined): string | null {
-  if (!name) {
-    return null;
-  }
-  return name
-    .toLowerCase()
-    .replace(/[^a-z0-9]/g, "")
-    .trim();
+  if (!name) return null;
+  return name.toLowerCase().replace(/[^a-z0-9]/g, "").trim();
 }
 
 function getEffectiveDbPrice(product: DbProductSummary): number | null {
-  if (typeof product.sale_price === "number") {
-    return product.sale_price;
-  }
-  if (typeof product.price === "number") {
-    return product.price;
-  }
+  if (typeof product.sale_price === "number") return product.sale_price;
+  if (typeof product.price === "number") return product.price;
   return null;
 }
 
+// 🧠 IN-UPDATE NA GAMIT ANG SMART MATCHER
 function findPriceMismatches(
   dbProducts: DbProductSummary[],
-  referenceByRef: Map<string, ListingProduct>,
-  referenceByName: Map<string, ListingProduct>
+  referenceListings: ListingProduct[]
 ): PriceMismatch[] {
   const mismatches: PriceMismatch[] = [];
 
   for (const product of dbProducts) {
     const dbPrice = getEffectiveDbPrice(product);
-    if (dbPrice === null) {
-      continue;
-    }
+    if (dbPrice === null) continue;
 
-    let listing: ListingProduct | undefined;
-    if (product.normalized_ref_no) {
-      listing = referenceByRef.get(product.normalized_ref_no);
-    }
-    if (!listing) {
-      const nameKey = normalizeNameKey(product.name);
-      if (nameKey) {
-        listing = referenceByName.get(nameKey);
-      }
-    }
-
-    if (!listing || listing.scraped_price === null) {
-      continue;
-    }
+    const listing = referenceListings.find(l => isSameProduct(product, l));
+    if (!listing || listing.scraped_price === null) continue;
 
     if (Math.abs(dbPrice - listing.scraped_price) > 0.01) {
       mismatches.push({
@@ -361,42 +290,27 @@ function findPriceMismatches(
   return mismatches;
 }
 
+// 🧠 IN-UPDATE NA GAMIT ANG SMART MATCHER
 function buildPriceComparisons(
   dbProducts: DbProductSummary[],
-  referenceByRef: Map<string, ListingProduct>,
-  referenceByName: Map<string, ListingProduct>
+  referenceListings: ListingProduct[]
 ): PriceComparison[] {
   const results: PriceComparison[] = [];
 
   for (const product of dbProducts) {
     const dbPrice = getEffectiveDbPrice(product);
-    if (dbPrice === null) {
-      continue;
-    }
+    if (dbPrice === null) continue;
 
-    let listing: ListingProduct | undefined;
-    let matchSource: "ref" | "name" | null = null;
-    if (product.normalized_ref_no) {
-      listing = referenceByRef.get(product.normalized_ref_no);
-      if (listing) {
-        matchSource = "ref";
-      }
-    }
-    if (!listing) {
-      const nameKey = normalizeNameKey(product.name);
-      if (nameKey) {
-        listing = referenceByName.get(nameKey);
-        if (listing) {
-          matchSource = "name";
-        }
-      }
-    }
-
-    if (!listing || listing.scraped_price === null || matchSource === null) {
-      continue;
-    }
+    const listing = referenceListings.find(l => isSameProduct(product, l));
+    if (!listing || listing.scraped_price === null) continue;
 
     const priceMatch = Math.abs(dbPrice - listing.scraped_price) <= 0.01;
+    
+    let matchSource: "ref" | "name" = "name";
+    if (product.normalized_ref_no && listing.normalized_ref_no && product.normalized_ref_no === listing.normalized_ref_no) {
+      matchSource = "ref";
+    }
+
     results.push({
       ref_no: product.ref_no,
       name: product.name,

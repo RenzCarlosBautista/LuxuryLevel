@@ -132,10 +132,18 @@ const { data: stagingData, error: stagingError } = await supabase
         body: JSON.stringify({ notes: 'Approved via Dashboard' })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Approval failed');
+      // Attempt to parse JSON, but fall back to text so we can surface HTML/errors
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        throw new Error(`Invalid JSON response from server: ${raw.slice(0,200)}`);
+      }
 
-      if (data.success) {
+      if (!response.ok) throw new Error(data?.error || data?.message || 'Approval failed');
+
+      if (data?.success) {
         setMessage({ type: 'success', text: `✓ Product successfully synced!` });
         fetchStagingProducts(); 
       }
@@ -158,10 +166,17 @@ const { data: stagingData, error: stagingError } = await supabase
         headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${token}` },
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Archive failed');
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        throw new Error(`Invalid JSON response from server: ${raw.slice(0,200)}`);
+      }
 
-      if (data.success) {
+      if (!response.ok) throw new Error(data?.error || data?.message || 'Archive failed');
+
+      if (data?.success) {
         setMessage({ type: 'success', text: `✓ Product successfully archived from live store!` });
         fetchStagingProducts();
       }
@@ -185,10 +200,17 @@ const { data: stagingData, error: stagingError } = await supabase
         body: JSON.stringify({ reason: 'Manual rejection' })
       });
 
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error || 'Rejection failed');
+      const raw = await response.text();
+      let data: any = null;
+      try {
+        data = raw ? JSON.parse(raw) : null;
+      } catch (e) {
+        throw new Error(`Invalid JSON response from server: ${raw.slice(0,200)}`);
+      }
 
-      if (data.success) {
+      if (!response.ok) throw new Error(data?.error || data?.message || 'Rejection failed');
+
+      if (data?.success) {
         setMessage({ type: 'success', text: '✓ Item ignored and removed from list.' });
         fetchStagingProducts();
       }

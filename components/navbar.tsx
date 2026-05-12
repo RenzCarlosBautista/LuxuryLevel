@@ -151,7 +151,7 @@ function Menu({
   toggleMobileNav?: () => void;
   brandsMenu: Brand[];
   jewelryMenu: Category[];
-  bagsMenu: Brand[];
+  bagsMenu: Category[];
 }) {
   const [activeItem, setActiveItem] = useState<string | null>(null);
 
@@ -182,12 +182,7 @@ function Menu({
         />
       ),
     },
-    {
-      // Binago natin ito para maging direct link na lang
-      title: "BAGS",
-      link: "/bags",
-      hasDropdown: false, 
-    },
+    { title: "BAGS", link: "/bags", hasDropdown: false },
     {
       title: "CONTACT US",
       link: "/contact-us",
@@ -217,7 +212,7 @@ function Menu({
 function MobileMenuButton(props: {
   brandsMenu: Brand[];
   jewelryMenu: Category[];
-  bagsMenu: Brand[];
+  bagsMenu: Category[];
 }) {
   const [isMobileNavOpen, setisMobileNavOpen] = useState<boolean>(false);
   const toggleMobileNav = () => {
@@ -325,7 +320,7 @@ function DesktopSearch() {
 export default function Navbar(props: {
   brandsMenu: Brand[];
   jewelryMenu: Category[];
-  bagsMenu: Brand[];
+  bagsMenu: Category[];
 }) {
   return (
     <div className="navbar fixed ">

@@ -169,3 +169,34 @@ export async function insertMissingFromReferenceToStaging(localOrphans: any[]): 
 
   logger.info(`Inserted ${rows.length} missing products (for archiving) into staging.`);
 }
+// 🚀 BAGONG FUNCTION PARA SA PRICE UPDATES
+export async function insertPriceUpdatesToStaging(mismatches: any[]): Promise<void> {
+  if (mismatches.length === 0) return;
+
+  const rows: StagingRow[] = mismatches.map(mismatch => ({
+    scraped_ref_no: mismatch.ref_no,
+    scraped_name: mismatch.name,
+    scraped_price: mismatch.reference_price, // 👈 IMPORTANTE: Ipapasa natin yung BAGONG presyo galing sa website
+    raw_brand_name: "Unknown",
+    raw_category_name: mismatch.category_name || "Unknown",
+    sync_status: "pending", // 👈 'pending' para basahin ng dashboard at ma-compare
+    scraped_at: new Date().toISOString(),
+    error_message: null,
+    image_url: null,
+    image_url_2: null,
+    image_url_3: null,
+    description: null,
+    color: null,
+    gender: null,
+  }));
+
+  const { error } = await supabase
+    .from("staging_products")
+    .upsert(rows, { onConflict: "scraped_ref_no" });
+
+  if (error) {
+    throw new Error(`Price mismatch staging insert failed: ${error.message}`);
+  }
+
+  logger.info(`Inserted ${rows.length} price updates into staging.`);
+}

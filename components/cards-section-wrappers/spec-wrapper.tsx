@@ -11,12 +11,9 @@ export default async function CardsSectionWrapper({
   sub_category: string | null;
   tableName: string;
 }) {
+  const categoryParam = encodeURIComponent((sub_category || tableName) || "");
   const [dataRes, brandListRes, subCategoriesRes] = await Promise.all([
-    fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/products/${
-        sub_category || tableName
-      }?${queryString}`
-    ),
+    fetch(`${process.env.NEXT_PUBLIC_API_URL}/products?category=${categoryParam}&${queryString}`),
     fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/categories/${tableName}/available-brands`
     ),
@@ -25,11 +22,15 @@ export default async function CardsSectionWrapper({
     ),
   ]);
 
-  const [data, brandList, catList] = await Promise.all([
+  const [data, brandList, rawCatList] = await Promise.all([
     dataRes.json(),
     brandListRes.json(),
     subCategoriesRes.json(),
   ]);
+
+  // For the Bags page we do NOT want to show other categories in the filters.
+  // If the current wrapper is for `bags`, hide sub-category filters by passing null.
+  const catList = tableName.toLowerCase() === 'bags' ? null : rawCatList;
 
   // --- PRICING ENGINE LOGIC ---
   const supabase = createClient(

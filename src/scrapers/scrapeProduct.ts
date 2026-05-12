@@ -83,7 +83,6 @@ export async function scrapeProduct(
     baseProduct.stock_status = stockStatus.trim() || null;
 
     baseProduct.specifications = await extractSpecifications(page);
-
     baseProduct.description = await extractDescription(page);
 
     if (!baseProduct.description || baseProduct.description.length === 0) {
@@ -126,11 +125,27 @@ export async function scrapeProduct(
       "model number",
     ]);
 
+    // 🚀 BAGONG LOGIC: Taga-kuha ng EXAKTONG SKU mula sa nakatagong table (Galing sa Inspect mo!)
+    const exactTableRefNo = await page.$$eval('.retail-price-table_x tr', (rows) => {
+      for (const row of rows) {
+        const label = row.querySelector('.label_x')?.textContent?.trim() || "";
+        if (label.includes('Ref. No') || label.includes('Reference')) {
+          return row.querySelector('.value_x')?.textContent?.trim() || null;
+        }
+      }
+      return null;
+    }).catch(() => null);
+
     const refFromUrl = extractRefFromSlug(new URL(productUrl).pathname);
     const refFromTitle = extractRefFromText(baseProduct.scraped_name);
-    let scrapedRef = refFromSpecs || refFromUrl || refFromTitle;
+    
+    // 🚀 BAGONG PRIORITY: Uunahin na nating isalba at gamitin si exactTableRefNo!
+    let scrapedRef = exactTableRefNo || refFromSpecs || refFromUrl || refFromTitle;
+    
     if (isBagsCategory(baseProduct.raw_category_name)) {
-      if (refFromUrl) {
+      if (exactTableRefNo) {
+        scrapedRef = exactTableRefNo; // Prio 1 kung may table
+      } else if (refFromUrl) {
         scrapedRef = refFromUrl;
       } else if (!scrapedRef) {
         scrapedRef = extractBagRefFromName(baseProduct.scraped_name, resolvedBrand);

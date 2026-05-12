@@ -97,7 +97,6 @@ export async function collectListingProducts(
             .filter((a) => {
               try {
                 const href = (a as HTMLAnchorElement).href || "";
-                // skip add-to-cart links or javascript anchors
                 if (!href || href.includes("add-to-cart") || href.startsWith("javascript:")) {
                   return false;
                 }
@@ -108,7 +107,6 @@ export async function collectListingProducts(
             })
             .map((anchor) => {
               const link = anchor as HTMLAnchorElement;
-              // try to find a nearby product container more flexibly
               const container =
                 link.closest("li.product, .product, [class*='product-'], [class*='product']") ||
                 link.parentElement ||
@@ -122,12 +120,12 @@ export async function collectListingProducts(
                 container?.querySelector(".product-name") ||
                 link.querySelector("h2, h3");
 
-              // search several common places for the price, including nested bdi/span structure
               const priceEl =
                 container?.querySelector(".price, .woocommerce-Price-amount, .amount, bdi, span.woocommerce-Price-amount, .product-details .price") ||
                 link.querySelector(".price, .woocommerce-Price-amount, .amount, bdi");
 
-              const addToCart = container?.querySelector("a[href*='add-to-cart'], button[name='add-to-cart']") as
+              // 🚀 FIX: Idinagdag ang .add_to_cart_button dahil standard WooCommerce class ito
+              const addToCart = container?.querySelector("a[href*='add-to-cart'], button[name='add-to-cart'], .add_to_cart_button") as
                 | HTMLAnchorElement
                 | HTMLButtonElement
                 | null;
@@ -142,14 +140,21 @@ export async function collectListingProducts(
                 addToCart?.getAttribute("title") ||
                 "";
 
+              // 🚀 FIX: Kukunin na natin yung exact SKU galing sa hidden attributes ng website!
+              const exactSku = 
+                addToCart?.getAttribute("data-product_sku") || 
+                container?.getAttribute("data-sku") || 
+                "";
+
               return {
                 href: link.href || "",
                 name: nameText,
                 priceText: priceEl?.textContent?.trim() || "",
+                sku: exactSku, // 👈 Ipinasa natin ang exact SKU sa return object
               };
             })
       )
-      .catch(() => [] as Array<{ href: string; name: string; priceText: string }>);
+      .catch(() => [] as Array<{ href: string; name: string; priceText: string; sku: string }>);
 
     if (options.debug && items.length === 0) {
       const anchorSample = await page
@@ -167,10 +172,20 @@ export async function collectListingProducts(
       }
 
       const displayName = item.name || slugToName(item.href) || "Unknown Product";
-      let normalizedRef = extractRefFromSlug(new URL(item.href).pathname);
+      
+      // 🚀 FIX: Ang ating bagong Priority Logic!
+      // 1. Unahin ang exact SKU kung nahanap sa HTML
+      let normalizedRef = item.sku ? normalizeRef(item.sku) : null;
+      
+      // 2. Kung wala talaga sa HTML, doon lang siya manghuhula sa URL
+      if (!normalizedRef) {
+        normalizedRef = extractRefFromSlug(new URL(item.href).pathname);
+      }
+      // 3. Kung wala pa rin at bag ito, doon lang manghuhula sa pangalan
       if (!normalizedRef && options.category === "bags") {
         normalizedRef = extractBagRefFromName(displayName);
       }
+
       const price = extractPrice(item.priceText);
       products.set(item.href, {
         product_url: item.href,

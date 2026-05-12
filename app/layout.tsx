@@ -87,7 +87,7 @@ export default async function RootLayout({
           }
         ),
         fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/categories/bags/available-brands`,
+          `${process.env.NEXT_PUBLIC_API_URL}/categories/bags/sub-categories`,
           {
             method: "GET",
           }

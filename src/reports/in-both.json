@@ -1,1 +1,137 @@
-[]
+[
+  {
+    "ref_no": "CONSTANCE18BLUESAPHIRE",
+    "normalized_ref_no": "CONSTANCE18BLUESAPHIRE",
+    "name": "Hermes Constance 18 Blue Saphire Epsom Leather Gold HW Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 75000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "KELLY32BLACKCLEMENCE2",
+    "normalized_ref_no": "KELLY32BLACKCLEMENCE2",
+    "name": "Hermes Kelly 28 Blue Encre Shiny Croco Palladium HW Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 315000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "KELLY32BLACKCLEMENCE1",
+    "normalized_ref_no": "KELLY32BLACKCLEMENCE1",
+    "name": "Hermes Kelly 25 Black Shiny Crocodile Gold HW Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 327000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "BIRKIN30FAUVE",
+    "normalized_ref_no": "BIRKIN30FAUVE",
+    "name": "Hermes Birkin 30 Fauve Matt Croco Gold Hw Handbag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 348000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "ROULIS18MINITAUPE",
+    "normalized_ref_no": "ROULIS18MINITAUPE",
+    "name": "Hermes Roulis 18 Mini Taupe Evervolor Leather Palladium HW Bag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 36000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "HERMESBIRKIN42YELLOW",
+    "normalized_ref_no": "HERMESBIRKIN42YELLOW",
+    "name": "Hermes Birkin 42 Yellow Taurillon Palladium Hardware Hand Bag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 36700,
+    "sale_price": null
+  },
+  {
+    "ref_no": "BIRKIN35ETAINGREY",
+    "normalized_ref_no": "BIRKIN35ETAINGREY",
+    "name": "Hermes Birkin 35 Etain Grey Togo Leather Palladium HW Handbag",
+    "category_name": "Handbag",
+    "product_url": null,
+    "price": 77000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "KELLY32BLACKCLEMENCE",
+    "normalized_ref_no": "KELLY32BLACKCLEMENCE",
+    "name": "Hermes Kelly 32 Black Clemence Leather Palladium Hardware Hand Bag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 32000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "BIRKIN25GRAPHITEMATTE",
+    "normalized_ref_no": "BIRKIN25GRAPHITEMATTE",
+    "name": "Hermes Birkin 25 Graphite Matte Croco Gold Hardware Handbag",
+    "category_name": "Luxury Handbag",
+    "product_url": null,
+    "price": 338000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "BIRKIN35FEU",
+    "normalized_ref_no": "BIRKIN35FEU",
+    "name": "Hermes Birkin 35 FEU Orange Epsom Leather Gold HW Handbag",
+    "category_name": "Handbags",
+    "product_url": null,
+    "price": 77000.02,
+    "sale_price": null
+  },
+  {
+    "ref_no": "BOLIDE35ETOUPE",
+    "normalized_ref_no": "BOLIDE35ETOUPE",
+    "name": "Hermes Bolide 35 Etoupe Clemence Leather palladium HW Hardware",
+    "category_name": "Handbag",
+    "product_url": null,
+    "price": 17000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "PICOTIN22ETOUPE",
+    "normalized_ref_no": "PICOTIN22ETOUPE",
+    "name": "Hermes Picotin 22 Etoupe Clemence Palladium Hardware Hand Bag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 15000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "KELLY25RETOURNE",
+    "normalized_ref_no": "KELLY25RETOURNE",
+    "name": "Hermes Kelly 25 Retourne Etain Togo Leather Palladium HW Hardware",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 110000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "HERMESBIRKIN30HIMALAYA",
+    "normalized_ref_no": "HERMESBIRKIN30HIMALAYA",
+    "name": "Hermes Birkin 30 Himalaya White Croco Matt Palladium HW Hardware",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 830000,
+    "sale_price": null
+  },
+  {
+    "ref_no": "HERMESPICOTIN18",
+    "normalized_ref_no": "HERMESPICOTIN18",
+    "name": "Hermes Picotin 18 Bleu Nuit Taurillon Clemence Leather Gold Hardware Bag",
+    "category_name": "bags",
+    "product_url": null,
+    "price": 14000,
+    "sale_price": null
+  }
+]
